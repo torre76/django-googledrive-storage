@@ -1,0 +1,6 @@
+.project
+.pydevproject
+89e3e07e0dc77f40c981b900c87d6246866172b7-privatekey.p12
+django_googledrive_storage
+*.pyc
+manage.py

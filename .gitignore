@@ -4,3 +4,6 @@
 django_googledrive_storage
 *.pyc
 manage.py
+dist
+gdstorage.egg-info
+db.sqlite3

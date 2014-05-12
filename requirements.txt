@@ -1,9 +1,0 @@
-Django==1.6.3
-google-api-python-client==1.2
-httplib2==0.9
-oauth2client==1.2
-pycrypto==2.6.1
-python-dateutil==2.2
-requests==2.2.1
-six==1.6.1
-wsgiref==0.1.2

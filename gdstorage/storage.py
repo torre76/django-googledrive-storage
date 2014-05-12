@@ -19,6 +19,7 @@ class GoogleDriveStorage(Storage):
     Google API console).
     """
     
+    _UNKNOWN_MIMETYPE_ = "application/octet-stream"
     _GOOGLE_DRIVE_FOLDER_MIMETYPE_ = "application/vnd.google-apps.folder"
 
     def __init__(self, service_email = None, private_key_file = None):
@@ -156,6 +157,8 @@ class GoogleDriveStorage(Storage):
         # Upload the file
         fd = BytesIO(content.file.read())
         mime_type = mimetypes.guess_type(name)
+        if mime_type is None:
+            mime_type = self._UNKNOWN_MIMETYPE_
         media_body = MediaIoBaseUpload(fd, mime_type, resumable=True)
         body = {
             'title': name,

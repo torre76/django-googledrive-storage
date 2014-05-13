@@ -4,7 +4,7 @@ from setuptools import setup
 long_description = codecs.open('README.rst', "r").read()
 
 setup(
-    name = "gdstorage",
+    name = "django-googledrive-storage",
     version = "1.0.0",
     author = "Gian Luca Dalla Torre",
     author_email = "gianluca.dallatorre@gmail.com",
@@ -26,9 +26,9 @@ setup(
         "requests >= 2.2.1",
     ],      
     classifiers=[
-        "Development Status :: 5 - Production/Stable",
+        "Development Development Status :: 4 - Beta",
         "Framework :: Django",
-        "License :: OSI Approved :: GNU Library or Lesser General Public License (LGPL)",
+        "License :: OSI Approved :: BSD License",
         "Programming Language :: Python :: 2.6",
         "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 2 :: Only"

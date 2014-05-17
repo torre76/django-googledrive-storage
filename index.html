@@ -28,9 +28,21 @@
       </header>
       <section>
         <h3>
-<a name="work-in-progress" class="anchor" href="#work-in-progress"><span class="octicon octicon-link"></span></a>Work in progress</h3>
+<a name="how-it-works" class="anchor" href="#how-it-works"><span class="octicon octicon-link"></span></a>How it works</h3>
 
-<p>Stay tuned.</p>
+<p><a href="https://github.com/torre76/django-googledrive-storage">Django Google Drive Storage</a> is an implementation of <a href="https://docs.djangoproject.com/en/1.6/ref/files/storage/">Django Storage</a> that uses <a href="https://drive.google.com">Google Drive</a> ad backend.</p>
+
+<p>Please notice that <strong>with this implementation you could not save or load data from a user's Drive</strong>.<br>
+You can use only a Drive <strong>dedicated to a Google Project</strong>. This means that:</p>
+
+<ul>
+<li>This Storage interacts with Google Drive as a Google Project, not a Google User. </li>
+<li>Your project can use Google Drive only thru <a href="https://developers.google.com/drive/">Google Drive SDK</a>. Because no user is associated with this Drive, <strong>you cannot use Google Drive User Interface</strong>.</li>
+<li>This Storage authenticates with Google using public private keys. See <a href="#Prerequisites">prerequisites</a> for how to obtain it.</li>
+</ul><p>Having stated that, with this storage you gain a 25GB space hosted on Google Server where to store your data using Django models.</p>
+
+<h3>
+<a name="prerequisites" class="anchor" href="#prerequisites"><span class="octicon octicon-link"></span></a>Prerequisites</h3>
       </section>
     </div>
     <footer>

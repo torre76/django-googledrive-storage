@@ -26,7 +26,7 @@ setup(
         "requests >= 2.2.1",
     ],      
     classifiers=[
-        "Development Development Status :: 4 - Beta",
+        "Development Status :: 4 - Beta",
         "Framework :: Django",
         "License :: OSI Approved :: BSD License",
         "Programming Language :: Python :: 2.6",

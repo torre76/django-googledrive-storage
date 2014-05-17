@@ -1,34 +1,33 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head>
-    <meta charset='utf-8'>
+    <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+    <title>Django Google Drive Storage by torre76</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 
     <!--[if lt IE 9]>
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
-
-    <title>Django Google Drive Storage by torre76</title>
   </head>
-
   <body>
-    <header>
-      <div class="inner">
+    <div class="wrapper">
+      <header>
         <h1>Django Google Drive Storage</h1>
-        <h2> Storage implementation for Django that interacts with Google Drive</h2>
-        <a href="https://github.com/torre76/django-googledrive-storage" class="button"><small>View project on</small>GitHub</a>
-      </div>
-    </header>
-
-    <div id="content-wrapper">
-      <div class="inner clearfix">
-        <section id="main-content">
-          <h3>
+        <p> Storage implementation for Django that interacts with Google Drive</p>
+        <p class="view"><a href="https://github.com/torre76/django-googledrive-storage">View the Project on GitHub <small>torre76/django-googledrive-storage</small></a></p>
+        <ul>
+          <li><a href="https://github.com/torre76/django-googledrive-storage/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/torre76/django-googledrive-storage/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/torre76/django-googledrive-storage">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h3>
 <a name="how-it-works" class="anchor" href="#how-it-works"><span class="octicon octicon-link"></span></a>How it works</h3>
 
 <p><a href="https://github.com/torre76/django-googledrive-storage">Django Google Drive Storage</a> is an implementation of <a href="https://docs.djangoproject.com/en/1.6/ref/files/storage/">Django Storage</a> that uses <a href="https://drive.google.com">Google Drive</a> ad backend.</p>
@@ -60,27 +59,69 @@
 <h3>
 <a name="setup" class="anchor" href="#setup"><span class="octicon octicon-link"></span></a>Setup</h3>
 
+<p>Once installed, there are some few steps to configure the storage:</p>
+
+<ul>
+<li>add the module <em>gdstorage</em> to your installed apps:</li>
+</ul><div class="highlight highlight-python"><pre><span class="n">INSTALLED_APPS</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="o">...</span><span class="p">,</span>
+    <span class="s">'django.contrib.staticfiles'</span><span class="p">,</span>
+    <span class="s">'gdstorage'</span>
+<span class="p">)</span>
+</pre></div>
+
+<ul>
+<li>create a section in your <em>setting.py</em> that contains the configuration for this storage:</li>
+</ul><div class="highlight highlight-python"><pre><span class="c">#</span>
+<span class="c"># Google Drive Storage Settings</span>
+<span class="c">#</span>
+
+<span class="n">GOOGLE_DRIVE_STORAGE</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">'service_account'</span><span class="p">:{</span>
+        <span class="s">'email'</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">project</span> <span class="n">email</span> <span class="n">associated</span> <span class="n">by</span> <span class="n">Google</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="s">'private_key_file_path'</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">p12</span> <span class="n">certificate</span> <span class="nb">file</span> <span class="n">path</span><span class="p">,</span> <span class="n">relative</span> <span class="n">to</span> <span class="n">your</span> <span class="n">project</span><span class="p">,</span> <span class="n">obtained</span> <span class="n">by</span> <span class="n">Google</span><span class="o">&gt;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+
+<p>The <strong>email</strong> should be the email Google assigned to your project, while the <strong>private_key_file_path</strong> must be the p12 file obtained by Google.</p>
+
+<ul>
+<li>instantiate the storage on you <em>models.py</em> file before using into the models:</li>
+</ul><div class="highlight highlight-python"><pre><span class="kn">from</span> <span class="nn">gdstorage.storage</span> <span class="kn">import</span> <span class="n">GoogleDriveStorage</span>
+
+<span class="c"># Define Google Drive Storage</span>
+<span class="n">gd_storage</span> <span class="o">=</span> <span class="n">GoogleDriveStorage</span><span class="p">()</span>
+</pre></div>
+
 <h3>
 <a name="use" class="anchor" href="#use"><span class="octicon octicon-link"></span></a>Use</h3>
-        </section>
 
-        <aside id="sidebar">
-          <a href="https://github.com/torre76/django-googledrive-storage/zipball/master" class="button">
-            <small>Download</small>
-            .zip file
-          </a>
-          <a href="https://github.com/torre76/django-googledrive-storage/tarball/master" class="button">
-            <small>Download</small>
-            .tar.gz file
-          </a>
+<p>Once configured you could use it as any storage for Django:</p>
 
-          <p class="repo-owner"><a href="https://github.com/torre76/django-googledrive-storage"></a> is maintained by <a href="https://github.com/torre76">torre76</a>.</p>
-
-          <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
-        </aside>
-      </div>
+<div class="highlight highlight-python"><pre><span class="k">class</span> <span class="nc">Map</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">AutoField</span><span class="p">(</span> <span class="n">primary_key</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">map_name</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+    <span class="n">map_data</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">FileField</span><span class="p">(</span><span class="n">upload_to</span><span class="o">=</span><span class="s">'/maps'</span><span class="p">,</span> <span class="n">storage</span><span class="o">=</span><span class="n">gd_storage</span><span class="p">)</span>
+<span class="sb">``</span>
+</pre></div>
+      </section>
     </div>
+    <footer>
+      <p>Project maintained by <a href="https://github.com/torre76">torre76</a></p>
+      <p>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></p>
+    </footer>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+              <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-51097925-1");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
 
-  
   </body>
 </html>

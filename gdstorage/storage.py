@@ -6,10 +6,11 @@ from django.core.files import File
 from django.core.files.storage import Storage
 import httplib2
 from io import BytesIO
-import mimetypes 
+import mimetypes
 from oauth2client.client import SignedJwtAssertionCredentials
 import os.path
 import requests
+
 
 class GoogleDriveStorage(Storage):
     """
@@ -18,17 +19,17 @@ class GoogleDriveStorage(Storage):
     (the drive is not owned by any Google User, but it is owned by the application declared on 
     Google API console).
     """
-    
+
     _UNKNOWN_MIMETYPE_ = "application/octet-stream"
     _GOOGLE_DRIVE_FOLDER_MIMETYPE_ = "application/vnd.google-apps.folder"
 
-    def __init__(self, service_email = None, private_key_file = None):
+    def __init__(self, user_email=None, service_email=None, private_key_file=None):
         self._drive_service = None
         try:
-            service_email = service_email if service_email is not None else settings.GOOGLE_DRIVE_STORAGE["service_account"]["email"]
-            private_key_file = private_key_file if private_key_file is not None else settings.GOOGLE_DRIVE_STORAGE["service_account"]["private_key_file_path"]
+            service_email = service_email or settings.GOOGLE_DRIVE_STORAGE["service_account"]["email"]
+            private_key_file = private_key_file or settings.GOOGLE_DRIVE_STORAGE["service_account"]["private_key_file_path"]
             key = None
-            
+
             # Creating a Google Drive Service API using a system account (without OAuth)
             # See https://developers.google.com/drive/web/service-accounts#console_name_project_service_accounts for more info
             private_key_abs_path = "{0}{1}{2}".format(settings.BASE_DIR, os.path.sep, private_key_file)
@@ -37,18 +38,23 @@ class GoogleDriveStorage(Storage):
             else:
                 with file(private_key_abs_path, 'rb') as f:
                     key = f.read()
+                kwargs = {}
+                if user_email:
+                    kwargs['sub'] = user_email
                 credentials = SignedJwtAssertionCredentials(
                     service_email,
                     key,
-                    scope = "https://www.googleapis.com/auth/drive"
+                    scope="https://www.googleapis.com/auth/drive",
+                    **kwargs
                 )
                 http = httplib2.Http()
                 http = credentials.authorize(http)
-                
+
                 self._drive_service = build('drive', 'v2', http=http)
         except KeyError:
-            raise ValueError("You must configure properly your settings file. Check Google Drive Storage docs for more info")
-        
+            raise ValueError(
+                "You must configure properly your settings file. Check Google Drive Storage docs for more info")
+
     def _split_path(self, p):
         """
         Split a complete path in a list of strings
@@ -58,10 +64,10 @@ class GoogleDriveStorage(Storage):
         :returns: list - List of strings that composes the path
         """
         p = p[1:] if p[0] == '/' else p
-        a,b = os.path.split(p)
+        a, b = os.path.split(p)
         return (self._split_path(a) if len(a) and len(b) else []) + [b]
-        
-    def _get_or_create_folder(self, path, parent_id = None):
+
+    def _get_or_create_folder(self, path, parent_id=None):
         """
         Create a folder on Google Drive. 
         It creates folders recursively.
@@ -94,8 +100,8 @@ class GoogleDriveStorage(Storage):
             return current_folder_data
         else:
             return folder_data
-    
-    def _check_file_exists(self, filename, parent_id = None):
+
+    def _check_file_exists(self, filename, parent_id=None):
         """
         Check if a file with specific parameters exists in Google Drive.
         
@@ -113,10 +119,11 @@ class GoogleDriveStorage(Storage):
             # First check if the first element exists as a folder
             # If so call the method recursively with next portion of path
             # Otherwise the path does not exists hence the file does not exists
-            q = u"mimeType = '{0}' and title = '{1}'".format(self._GOOGLE_DRIVE_FOLDER_MIMETYPE_, unicode(split_filename[0]))
+            q = u"mimeType = '{0}' and title = '{1}'".format(self._GOOGLE_DRIVE_FOLDER_MIMETYPE_,
+                                                             unicode(split_filename[0]))
             if parent_id is not None:
                 q = u"{0} and '{1}' in parents".format(q, parent_id)
-            max_results = 1000 # Max value admitted from google drive
+            max_results = 1000  # Max value admitted from google drive
             folders = self._drive_service.files().list(q=q, maxResults=max_results).execute()
             for folder in folders["items"]:
                 if folder["title"] == unicode(split_filename[0]):
@@ -128,7 +135,7 @@ class GoogleDriveStorage(Storage):
             q = u"title = '{0}'".format(split_filename[0])
             if parent_id is not None:
                 q = u"{0} and '{1}' in parents".format(q, parent_id)
-            max_results = 1000 # Max value admitted from google drive
+            max_results = 1000  # Max value admitted from google drive
             file_list = self._drive_service.files().list(q=q, maxResults=max_results).execute()
             if len(file_list["items"]) == 0:
                 q = u"" if parent_id is None else u"'{0}' in parents".format(parent_id)
@@ -139,16 +146,15 @@ class GoogleDriveStorage(Storage):
                 return None
             else:
                 return file_list["items"][0]
-        
+
     # Methods that had to be implemented
     # to create a valid storage for Django
-    
+
     def _open(self, name, mode='rb'):
         file_data = self._check_file_exists(name)
-        r = requests.get(file_data['webContentLink'])
-        return File(BytesIO(r.content), name) 
-        
-     
+        r = requests.get(file_data['alternateLink'])
+        return File(BytesIO(r.content), name)
+
     def _save(self, name, content):
         folder_path = os.path.sep.join(self._split_path(name)[:-1])
         folder_data = self._get_or_create_folder(folder_path)
@@ -166,21 +172,20 @@ class GoogleDriveStorage(Storage):
         }
         # Set the parent folder.
         if parent_id:
-            body['parents'] = [{'id': parent_id}]        
+            body['parents'] = [{'id': parent_id}]
         file_data = self._drive_service.files().insert(
             body=body,
             media_body=media_body).execute()
-            
+
         # Setting up public permission
         public_permission = {
             'type': 'anyone',
             'role': 'reader'
         }
         self._drive_service.permissions().insert(fileId=file_data["id"], body=public_permission).execute()
-        
+
         return file_data[u'originalFilename']
-        
-    
+
     def delete(self, name):
         """
         Deletes the specified file from the storage system.
@@ -205,7 +210,7 @@ class GoogleDriveStorage(Storage):
         folder_data = self._check_file_exists(path)
         if folder_data is not None:
             params = {
-                'q':  u"'{0}' in parents".format(folder_data["id"]),
+                'q': u"'{0}' in parents".format(folder_data["id"]),
                 'maxResults': 1000
             }
             page_token = None
@@ -242,7 +247,7 @@ class GoogleDriveStorage(Storage):
         if file_data is None:
             return None
         else:
-            return file_data["webContentLink"]
+            return file_data["alternateLink"]
 
     def accessed_time(self, name):
         """
@@ -260,7 +265,7 @@ class GoogleDriveStorage(Storage):
         if file_data is None:
             return None
         else:
-            return parse(file_data['createdDate']) 
+            return parse(file_data['createdDate'])
 
     def modified_time(self, name):
         """

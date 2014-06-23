@@ -8,3 +8,5 @@ dist
 gdstorage.egg-info
 db.sqlite3
 django_googledrive_storage.egg-info
+.idea/
+venv/

@@ -207,25 +207,23 @@ class GoogleDriveStorage(Storage):
         the first item being directories, the second item being files.
         """
         directories, files = [], []
-        folder_data = self._check_file_exists(path)
-        if folder_data is not None:
-            params = {
-                'q': u"'{0}' in parents".format(folder_data["id"]),
-                'maxResults': 1000
+        if path == "/":
+            folder_id = {"id": u"root"}
+        else:
+            folder_id = self._check_file_exists(path)
+        if folder_id:
+            file_params = {
+                'q': u"'{0}' in parents and mimeType != '{1}'".format(folder_id["id"], self._GOOGLE_DRIVE_FOLDER_MIMETYPE_),
             }
-            page_token = None
-            while True:
-                if page_token is not None:
-                    params['pageToken'] = page_token
-                files_list = self._drive_service.files().list(**params).execute()
-                for element in files_list["items"]:
-                    if element["mimeType"] == self._GOOGLE_DRIVE_FOLDER_MIMETYPE_:
-                        directories.append(os.path.join(path, element["title"]))
-                    else:
-                        files.append(os.path.join(path, element["title"]))
-                page_token = files_list.get('nextPageToken')
-                if not page_token:
-                    break
+            dir_params = {
+                'q': u"'{0}' in parents and mimeType = '{1}'".format(folder_id["id"], self._GOOGLE_DRIVE_FOLDER_MIMETYPE_),
+            }
+            files_list = self._drive_service.files().list(**file_params).execute()
+            dir_list = self._drive_service.files().list(**dir_params).execute()
+            for element in files_list["items"]:
+                files.append(os.path.join(path, element["title"]))
+            for element in dir_list["items"]:
+                directories.append(os.path.join(path, element["title"]))
         return directories, files
 
     def size(self, name):

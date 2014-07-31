@@ -24,26 +24,18 @@ class GoogleDriveStorage(Storage):
     _UNKNOWN_MIMETYPE_ = "application/octet-stream"
     _GOOGLE_DRIVE_FOLDER_MIMETYPE_ = "application/vnd.google-apps.folder"
 
-    def __init__(self, service_email=None, private_key_file=None, private_key_password=None, user_email=None):
+    def __init__(self, service_email=None, private_key=None, user_email=None):
         """
         Handles credentials and builds the google service.
 
         :param service_email: String
-        :param private_key_file: Path
-        :param private_key_password: String
+        :param private_key: Path
         :param user_email: String
         :raise ValueError:
         """
         service_email = service_email or settings.GOOGLE_DRIVE_STORAGE_SERVICE_EMAIL
-        private_key_file = private_key_file or settings.GOOGLE_DRIVE_STORAGE_KEY_FILE
-        private_key_password = private_key_password or settings.GOOGLE_DRIVE_STORAGE_KEY_FILE_PASSWORD
+        key = private_key or settings.GOOGLE_DRIVE_STORAGE_KEY
 
-        # Creating a Google Drive Service API using a system account (without OAuth)
-        # See https://developers.google.com/drive/web/service-accounts#console_name_project_service_accounts for more info
-        if not os.path.exists(private_key_file):
-            raise ValueError("Unable to find provided key file: %s" % private_key_file)
-        with file(private_key_file, 'rb') as f:
-            key = f.read()
         kwargs = {}
         if user_email:
             kwargs['sub'] = user_email
@@ -51,7 +43,6 @@ class GoogleDriveStorage(Storage):
             service_email,
             key,
             scope="https://www.googleapis.com/auth/drive",
-            private_key_password=private_key_password,
             **kwargs
         )
         http = httplib2.Http()

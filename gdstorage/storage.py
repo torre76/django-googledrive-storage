@@ -163,7 +163,7 @@ class GoogleDriveStorage(Storage):
         # Upload the file
         fd = BytesIO(content.file.read())
         mime_type = mimetypes.guess_type(name)
-        if mime_type is None:
+        if mime_type[0] is None:
             mime_type = self._UNKNOWN_MIMETYPE_
         media_body = MediaIoBaseUpload(fd, mime_type, resumable=True)
         body = {

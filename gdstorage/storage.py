@@ -37,8 +37,8 @@ class GoogleDriveStorage(Storage):
         key = private_key or settings.GOOGLE_DRIVE_STORAGE_KEY
 
         kwargs = {}
-        if user_email:
-            kwargs['sub'] = user_email
+        if user_email or settings.GOOGLE_DRIVE_STORAGE_USER_EMAIL:
+            kwargs['sub'] = user_email or settings.GOOGLE_DRIVE_STORAGE_USER_EMAIL
         credentials = SignedJwtAssertionCredentials(
             service_email,
             key,

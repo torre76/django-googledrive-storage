@@ -1,3 +1,6 @@
+from io import BytesIO
+import mimetypes
+
 from apiclient.discovery import build
 from apiclient.http import MediaIoBaseUpload
 from dateutil.parser import parse
@@ -5,8 +8,6 @@ from django.conf import settings
 from django.core.files import File
 from django.core.files.storage import Storage
 import httplib2
-from io import BytesIO
-import mimetypes
 from oauth2client.client import SignedJwtAssertionCredentials
 import os.path
 import requests
@@ -23,42 +24,36 @@ class GoogleDriveStorage(Storage):
     _UNKNOWN_MIMETYPE_ = "application/octet-stream"
     _GOOGLE_DRIVE_FOLDER_MIMETYPE_ = "application/vnd.google-apps.folder"
 
-    def __init__(self, user_email=None, service_email=None, private_key_file=None):
-        self._drive_service = None
-        try:
-            service_email = service_email or settings.GOOGLE_DRIVE_STORAGE["service_account"]["email"]
-            private_key_file = private_key_file or settings.GOOGLE_DRIVE_STORAGE["service_account"]["private_key_file_path"]
-            key = None
+    def __init__(self, service_email=None, private_key=None, user_email=None):
+        """
+        Handles credentials and builds the google service.
 
-            # Creating a Google Drive Service API using a system account (without OAuth)
-            # See https://developers.google.com/drive/web/service-accounts#console_name_project_service_accounts for more info
-            private_key_abs_path = "{0}{1}{2}".format(settings.BASE_DIR, os.path.sep, private_key_file)
-            if not os.path.exists(private_key_abs_path):
-                raise ValueError("Unable to find provided key file")
-            else:
-                with file(private_key_abs_path, 'rb') as f:
-                    key = f.read()
-                kwargs = {}
-                if user_email:
-                    kwargs['sub'] = user_email
-                credentials = SignedJwtAssertionCredentials(
-                    service_email,
-                    key,
-                    scope="https://www.googleapis.com/auth/drive",
-                    **kwargs
-                )
-                http = httplib2.Http()
-                http = credentials.authorize(http)
+        :param service_email: String
+        :param private_key: Path
+        :param user_email: String
+        :raise ValueError:
+        """
+        service_email = service_email or settings.GOOGLE_DRIVE_STORAGE_SERVICE_EMAIL
+        key = private_key or settings.GOOGLE_DRIVE_STORAGE_KEY
 
-                self._drive_service = build('drive', 'v2', http=http)
-        except KeyError:
-            raise ValueError(
-                "You must configure properly your settings file. Check Google Drive Storage docs for more info")
+        kwargs = {}
+        if user_email:
+            kwargs['sub'] = user_email
+        credentials = SignedJwtAssertionCredentials(
+            service_email,
+            key,
+            scope="https://www.googleapis.com/auth/drive",
+            **kwargs
+        )
+        http = httplib2.Http()
+        http = credentials.authorize(http)
+
+        self._drive_service = build('drive', 'v2', http=http)
 
     def _split_path(self, p):
         """
         Split a complete path in a list of strings
-        
+
         :param p: Path to be splitted
         :type p: string
         :returns: list - List of strings that composes the path
@@ -69,10 +64,10 @@ class GoogleDriveStorage(Storage):
 
     def _get_or_create_folder(self, path, parent_id=None):
         """
-        Create a folder on Google Drive. 
+        Create a folder on Google Drive.
         It creates folders recursively.
         If the folder already exists, it retrieves only the unique identifier.
-        
+
         :param path: Path that had to be created
         :type path: string
         :param parent_id: Unique identifier for its parent (folder)
@@ -104,7 +99,7 @@ class GoogleDriveStorage(Storage):
     def _check_file_exists(self, filename, parent_id=None):
         """
         Check if a file with specific parameters exists in Google Drive.
-        
+
         :param filename: File or folder to search
         :type filename: string
         :param parent_id: Unique identifier for its parent (folder)
@@ -274,4 +269,4 @@ class GoogleDriveStorage(Storage):
         if file_data is None:
             return None
         else:
-            return parse(file_data["modifiedDate"]) 
+            return parse(file_data["modifiedDate"])

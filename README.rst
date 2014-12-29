@@ -7,4 +7,4 @@ This is a `Django Storage <https://docs.djangoproject.com/en/1.7/ref/files/stora
 Documentation and Installation instructions
 -------------------------------------------
 
-Documentation and installation instructions can be found at `Django Google Drive Storage dedicated pages <http://torre76.github.io/django-googledrive-storage/>`_.
+Documentation and installation instructions can be found at `Read The Docs <http://django-googledrive-storage.readthedocs.org/>`_.

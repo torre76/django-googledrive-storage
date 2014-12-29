@@ -10,3 +10,5 @@ db.sqlite3
 django_googledrive_storage.egg-info
 .idea/
 venv/
+certificate/89e3e07e0dc77f40c981b900c87d6246866172b7-privatekey.crt
+certificate/89e3e07e0dc77f40c981b900c87d6246866172b7-privatekey.key

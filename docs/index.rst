@@ -5,7 +5,7 @@ Django Google Drive Storage
 is a `Django Storage <https://docs.djangoproject.com/en/1.7/ref/files/storage/>`_
 implementation that uses `Google Drive <https://drive.google.com>`_ as a backend for storing data.
 
-Please notice that with **this implementation you could not save or load data from a user's Drive**.
+Please take note that with **this implementation you could not save or load data from a user's Drive**.
 You can use only a Drive **dedicated to a Google Project**. This means that:
 
 * this storage interacts with Google Drive as a Google Project, not a Google User.

@@ -4,6 +4,7 @@ import mimetypes
 from apiclient.discovery import build
 from apiclient.http import MediaIoBaseUpload
 from dateutil.parser import parse
+import django
 from django.conf import settings
 from django.core.files import File
 from django.core.files.storage import Storage
@@ -12,6 +13,8 @@ from oauth2client.client import SignedJwtAssertionCredentials
 import os.path
 import requests
 
+
+DJANGO_VERSION = django.VERSION[:2]
 
 class GoogleDriveStorage(Storage):
     """
@@ -33,15 +36,15 @@ class GoogleDriveStorage(Storage):
         :param user_email: String
         :raise ValueError:
         """
-        service_email = service_email or settings.GOOGLE_DRIVE_STORAGE_SERVICE_EMAIL
-        key = private_key or settings.GOOGLE_DRIVE_STORAGE_KEY
+        self._service_email = service_email or settings.GOOGLE_DRIVE_STORAGE_SERVICE_EMAIL
+        self._key = private_key or settings.GOOGLE_DRIVE_STORAGE_KEY
 
         kwargs = {}
         if user_email or settings.GOOGLE_DRIVE_STORAGE_USER_EMAIL:
-            kwargs['sub'] = user_email or settings.GOOGLE_DRIVE_STORAGE_USER_EMAIL
+            self._user_email = kwargs['sub'] = user_email or settings.GOOGLE_DRIVE_STORAGE_USER_EMAIL
         credentials = SignedJwtAssertionCredentials(
-            service_email,
-            key,
+            self._service_email,
+            self._key,
             scope="https://www.googleapis.com/auth/drive",
             **kwargs
         )
@@ -49,6 +52,20 @@ class GoogleDriveStorage(Storage):
         http = credentials.authorize(http)
 
         self._drive_service = build('drive', 'v2', http=http)
+
+    if DJANGO_VERSION >= (1, 7):
+        def deconstruct(self):
+            """
+                Handle field serialization to support migration
+
+            """
+            name, path, args, kwargs = super(GoogleDriveStorage, self).deconstruct()
+            if self._service_email is not None:
+                kwargs["service_email"] = self._service_email
+            if self._key is not None:
+                kwargs["private_key"] = self._key
+            if self._user_email is not None:
+                kwargs["user_email"] = self._user_email
 
     def _split_path(self, p):
         """

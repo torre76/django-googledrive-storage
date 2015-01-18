@@ -12,7 +12,7 @@ You can use only a Drive **dedicated to a Google Project**. This means that:
 * your project can use Google Drive only through `Google Drive SDK <https://developers.google.com/drive/>`_. Because no user is associated with this Drive, **you cannot use Google Drive User Interface**.
 * this storage authenticates with Google using public private keys. See prerequisites_ for how to obtain it.
 
-Having stated that, with this storage you gain a 25GB space hosted on Google Server where you are able to store data
+Having stated that, with this storage you gain a 15GB space hosted on Google Server where you are able to store data
 using Django models.
 
 .. _prerequisites:

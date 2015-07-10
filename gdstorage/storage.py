@@ -16,11 +16,12 @@ import requests
 
 DJANGO_VERSION = django.VERSION[:2]
 
+
 class GoogleDriveStorage(Storage):
     """
     Storage class for Django that interacts with Google Drive as persistent storage.
-    This class uses a system account for Google API that create an application drive 
-    (the drive is not owned by any Google User, but it is owned by the application declared on 
+    This class uses a system account for Google API that create an application drive
+    (the drive is not owned by any Google User, but it is owned by the application declared on
     Google API console).
     """
 
@@ -53,19 +54,6 @@ class GoogleDriveStorage(Storage):
 
         self._drive_service = build('drive', 'v2', http=http)
 
-    if DJANGO_VERSION >= (1, 7):
-        def deconstruct(self):
-            """
-                Handle field serialization to support migration
-
-            """
-            name, path, args, kwargs = super(GoogleDriveStorage, self).deconstruct()
-            if self._service_email is not None:
-                kwargs["service_email"] = self._service_email
-            if self._key is not None:
-                kwargs["private_key"] = self._key
-            if self._user_email is not None:
-                kwargs["user_email"] = self._user_email
 
     def _split_path(self, p):
         """
@@ -287,3 +275,23 @@ class GoogleDriveStorage(Storage):
             return None
         else:
             return parse(file_data["modifiedDate"])
+
+
+if DJANGO_VERSION >= (1, 7):
+    from django.utils.deconstruct import deconstructible
+
+    @deconstructible
+    class GoogleDriveStorage(GoogleDriveStorage):
+        def deconstruct(self):
+            """
+                Handle field serialization to support migration
+
+            """
+            name, path, args, kwargs = \
+                super(GoogleDriveStorage, self).deconstruct()
+            if self._service_email is not None:
+                kwargs["service_email"] = self._service_email
+            if self._key is not None:
+                kwargs["private_key"] = self._key
+            if self._user_email is not None:
+                kwargs["user_email"] = self._user_email

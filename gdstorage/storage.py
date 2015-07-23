@@ -152,8 +152,10 @@ class GoogleDriveStorage(Storage):
 
     def _open(self, name, mode='rb'):
         file_data = self._check_file_exists(name)
-        r = requests.get(file_data['alternateLink'])
-        return File(BytesIO(r.content), name)
+        response, content = self._drive_service._http.request(
+            file_data['downloadUrl'])
+
+        return File(BytesIO(content), name)
 
     def _save(self, name, content):
         folder_path = os.path.sep.join(self._split_path(name)[:-1])

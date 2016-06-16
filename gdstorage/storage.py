@@ -9,7 +9,7 @@ from django.conf import settings
 from django.core.files import File
 from django.core.files.storage import Storage
 import httplib2
-from oauth2client.client import SignedJwtAssertionCredentials
+from oauth2client.service_account import ServiceAccountCredentials
 import os.path
 import requests
 
@@ -43,7 +43,7 @@ class GoogleDriveStorage(Storage):
         kwargs = {}
         if user_email or settings.GOOGLE_DRIVE_STORAGE_USER_EMAIL:
             self._user_email = kwargs['sub'] = user_email or settings.GOOGLE_DRIVE_STORAGE_USER_EMAIL
-        credentials = SignedJwtAssertionCredentials(
+        credentials = ServiceAccountCredentials(
             self._service_email,
             self._key,
             scope="https://www.googleapis.com/auth/drive",

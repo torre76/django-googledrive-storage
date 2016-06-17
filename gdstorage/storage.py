@@ -9,7 +9,7 @@ from django.conf import settings
 from django.core.files import File
 from django.core.files.storage import Storage
 import httplib2
-from oauth2client.client import SignedJwtAssertionCredentials
+from oauth2client.service_account import ServiceAccountCredentials
 import os.path
 import requests
 
@@ -28,32 +28,23 @@ class GoogleDriveStorage(Storage):
     _UNKNOWN_MIMETYPE_ = "application/octet-stream"
     _GOOGLE_DRIVE_FOLDER_MIMETYPE_ = "application/vnd.google-apps.folder"
 
-    def __init__(self, service_email=None, private_key=None, user_email=None):
+    def __init__(self, key_path=None):
         """
         Handles credentials and builds the google service.
 
-        :param service_email: String
-        :param private_key: Path
-        :param user_email: String
+        :param key_path: Path
         :raise ValueError:
         """
-        self._service_email = service_email or settings.GOOGLE_DRIVE_STORAGE_SERVICE_EMAIL
-        self._key = private_key or settings.GOOGLE_DRIVE_STORAGE_KEY
+        self._key_path = key_path or settings.GOOGLE_DRIVE_STORAGE_KEY_PATH
 
-        kwargs = {}
-        if user_email or settings.GOOGLE_DRIVE_STORAGE_USER_EMAIL:
-            self._user_email = kwargs['sub'] = user_email or settings.GOOGLE_DRIVE_STORAGE_USER_EMAIL
-        credentials = SignedJwtAssertionCredentials(
-            self._service_email,
-            self._key,
-            scope="https://www.googleapis.com/auth/drive",
-            **kwargs
+        credentials = ServiceAccountCredentials.from_json_keyfile_name(
+            self._key_path,
+            scopes=["https://www.googleapis.com/auth/drive"]
         )
         http = httplib2.Http()
         http = credentials.authorize(http)
 
         self._drive_service = build('drive', 'v2', http=http)
-
 
     def _split_path(self, p):
         """
@@ -286,14 +277,9 @@ if DJANGO_VERSION >= (1, 7):
     class GoogleDriveStorage(GoogleDriveStorage):
         def deconstruct(self):
             """
-                Handle field serialization to support migration
-
+            Handle field serialization to support migration
             """
             name, path, args, kwargs = \
                 super(GoogleDriveStorage, self).deconstruct()
-            if self._service_email is not None:
-                kwargs["service_email"] = self._service_email
-            if self._key is not None:
-                kwargs["private_key"] = self._key
-            if self._user_email is not None:
-                kwargs["user_email"] = self._user_email
+            if self._key_path is not None:
+                kwargs["key_path"] = self._key_path

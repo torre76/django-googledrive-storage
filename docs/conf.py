@@ -12,6 +12,8 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import datetime
 import os
 
@@ -51,8 +53,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'Django Google Drive Storage'
-copyright = u'2014 - {}, Gian Luca Dalla Torre'.format(datetime.datetime.now().year)
+project = 'Django Google Drive Storage'
+copyright = '2014 - {}, Gian Luca Dalla Torre'.format(datetime.datetime.now().year)
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -204,8 +206,8 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  ('index', 'DjangoGoogleDriveStorage.tex', u'Django Google Drive Storage Documentation',
-   u'Gian Luca Dalla Torre', 'manual'),
+  ('index', 'DjangoGoogleDriveStorage.tex', 'Django Google Drive Storage Documentation',
+   'Gian Luca Dalla Torre', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -234,8 +236,8 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'djangogoogledrivestorage', u'Django Google Drive Storage Documentation',
-     [u'Gian Luca Dalla Torre'], 1)
+    ('index', 'djangogoogledrivestorage', 'Django Google Drive Storage Documentation',
+     ['Gian Luca Dalla Torre'], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -248,8 +250,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'DjangoGoogleDriveStorage', u'Django Google Drive Storage Documentation',
-   u'Gian Luca Dalla Torre', 'DjangoGoogleDriveStorage', 'One line description of project.',
+  ('index', 'DjangoGoogleDriveStorage', 'Django Google Drive Storage Documentation',
+   'Gian Luca Dalla Torre', 'DjangoGoogleDriveStorage', 'One line description of project.',
    'Miscellaneous'),
 ]
 

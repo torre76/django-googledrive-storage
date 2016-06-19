@@ -5,7 +5,7 @@ long_description = codecs.open('README.rst', "r").read()
 
 setup(
     name = "django-googledrive-storage",
-    version = "1.1.3",
+    version = "1.1.4",
     author = "Gian Luca Dalla Torre",
     author_email = "gianluca.dallatorre@gmail.com",
     description = ("Storage implementation for Django that interacts with Google Drive"),

@@ -20,12 +20,13 @@ setup(
     },
     install_requires=[
         "Django >= 1.7",
+        "oauth2client >= 2.2.0",
         "google-api-python-client >= 1.2",
         "pycrypto >= 2.6.1",
         "python-dateutil >=2.2",
         "requests >= 2.2.1",
         "django-appconf>=0.6",
-    ],      
+    ],
     classifiers=[
         "Development Status :: 4 - Beta",
         "Framework :: Django",

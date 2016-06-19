@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from io import BytesIO
 import mimetypes
 
@@ -11,7 +13,6 @@ from django.core.files.storage import Storage
 import httplib2
 from oauth2client.service_account import ServiceAccountCredentials
 import os.path
-import requests
 
 
 DJANGO_VERSION = django.VERSION[:2]
@@ -119,29 +120,29 @@ class GoogleDriveStorage(Storage):
             # First check if the first element exists as a folder
             # If so call the method recursively with next portion of path
             # Otherwise the path does not exists hence the file does not exists
-            q = u"mimeType = '{0}' and title = '{1}'".format(self._GOOGLE_DRIVE_FOLDER_MIMETYPE_,
-                                                             unicode(split_filename[0]))
+            q = "mimeType = '{0}' and title = '{1}'".format(self._GOOGLE_DRIVE_FOLDER_MIMETYPE_,
+                                                             str(split_filename[0]))
             if parent_id is not None:
-                q = u"{0} and '{1}' in parents".format(q, parent_id)
+                q = "{0} and '{1}' in parents".format(q, parent_id)
             max_results = 1000  # Max value admitted from google drive
             folders = self._drive_service.files().list(q=q, maxResults=max_results).execute()
             for folder in folders["items"]:
-                if folder["title"] == unicode(split_filename[0]):
+                if folder["title"] == str(split_filename[0]):
                     # Assuming every folder has a single parent
                     return self._check_file_exists(os.path.sep.join(split_filename[1:]), folder["id"])
             return None
         else:
             # This is a file, checking if exists
-            q = u"title = '{0}'".format(split_filename[0])
+            q = "title = '{0}'".format(split_filename[0])
             if parent_id is not None:
-                q = u"{0} and '{1}' in parents".format(q, parent_id)
+                q = "{0} and '{1}' in parents".format(q, parent_id)
             max_results = 1000  # Max value admitted from google drive
             file_list = self._drive_service.files().list(q=q, maxResults=max_results).execute()
             if len(file_list["items"]) == 0:
-                q = u"" if parent_id is None else u"'{0}' in parents".format(parent_id)
+                q = "" if parent_id is None else "'{0}' in parents".format(parent_id)
                 file_list = self._drive_service.files().list(q=q, maxResults=max_results).execute()
                 for element in file_list["items"]:
-                    if unicode(split_filename[0]) in element["title"]:
+                    if str(split_filename[0]) in element["title"]:
                         return element
                 return None
             else:
@@ -186,7 +187,7 @@ class GoogleDriveStorage(Storage):
         }
         self._drive_service.permissions().insert(fileId=file_data["id"], body=public_permission).execute()
 
-        return file_data[u'originalFilename']
+        return file_data['originalFilename']
 
     def delete(self, name):
         """
@@ -210,15 +211,15 @@ class GoogleDriveStorage(Storage):
         """
         directories, files = [], []
         if path == "/":
-            folder_id = {"id": u"root"}
+            folder_id = {"id": "root"}
         else:
             folder_id = self._check_file_exists(path)
         if folder_id:
             file_params = {
-                'q': u"'{0}' in parents and mimeType != '{1}'".format(folder_id["id"], self._GOOGLE_DRIVE_FOLDER_MIMETYPE_),
+                'q': "'{0}' in parents and mimeType != '{1}'".format(folder_id["id"], self._GOOGLE_DRIVE_FOLDER_MIMETYPE_),
             }
             dir_params = {
-                'q': u"'{0}' in parents and mimeType = '{1}'".format(folder_id["id"], self._GOOGLE_DRIVE_FOLDER_MIMETYPE_),
+                'q': "'{0}' in parents and mimeType = '{1}'".format(folder_id["id"], self._GOOGLE_DRIVE_FOLDER_MIMETYPE_),
             }
             files_list = self._drive_service.files().list(**file_params).execute()
             dir_list = self._drive_service.files().list(**dir_params).execute()

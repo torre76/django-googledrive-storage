@@ -39,10 +39,13 @@ class GoogleDriveStorage(Storage):
         """
         self._service_email = service_email or settings.GOOGLE_DRIVE_STORAGE_SERVICE_EMAIL
         self._key = private_key or settings.GOOGLE_DRIVE_STORAGE_KEY
+        self._user_email = getattr(settings, "GOOGLE_DRIVE_STORAGE_USER_EMAIL", user_email)
 
         kwargs = {}
-        if user_email or settings.GOOGLE_DRIVE_STORAGE_USER_EMAIL:
-            self._user_email = kwargs['sub'] = user_email or settings.GOOGLE_DRIVE_STORAGE_USER_EMAIL
+
+        if user_email_setting:
+            kwargs['sub'] = self._user_email
+
         credentials = ServiceAccountCredentials(
             self._service_email,
             self._key,
@@ -53,7 +56,6 @@ class GoogleDriveStorage(Storage):
         http = credentials.authorize(http)
 
         self._drive_service = build('drive', 'v2', http=http)
-
 
     def _split_path(self, p):
         """
@@ -286,8 +288,7 @@ if DJANGO_VERSION >= (1, 7):
     class GoogleDriveStorage(GoogleDriveStorage):
         def deconstruct(self):
             """
-                Handle field serialization to support migration
-
+            Handle field serialization to support migration
             """
             name, path, args, kwargs = \
                 super(GoogleDriveStorage, self).deconstruct()

@@ -1,0 +1,12 @@
+language: python
+python:
+- '2.7'
+- '3.2'
+- '3.3'
+- '3.4'
+- '3.5'
+install: python setup.py
+script: python manage.py test
+before_install:
+- openssl aes-256-cbc -K $encrypted_0a18e31b38f0_key -iv $encrypted_0a18e31b38f0_iv
+  -in gdstorage.json.enc -out test/gdstorage.json -d

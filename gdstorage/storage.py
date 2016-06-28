@@ -121,7 +121,7 @@ class GoogleDriveStorage(Storage):
             max_results = 1000  # Max value admitted from google drive
             folders = self._drive_service.files().list(q=q, maxResults=max_results).execute()
             for folder in folders["items"]:
-                if folder["title"] == unicode(split_filename[0]):
+                if folder["title"] == split_filename[0]:
                     # Assuming every folder has a single parent
                     return self._check_file_exists(os.path.sep.join(split_filename[1:]), folder["id"])
             return None
@@ -136,7 +136,7 @@ class GoogleDriveStorage(Storage):
                 q = "" if parent_id is None else "'{0}' in parents".format(parent_id)
                 file_list = self._drive_service.files().list(q=q, maxResults=max_results).execute()
                 for element in file_list["items"]:
-                    if unicode(split_filename[0]) in element["title"]:
+                    if split_filename[0] in element["title"]:
                         return element
                 return None
             else:

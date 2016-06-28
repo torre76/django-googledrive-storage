@@ -288,7 +288,5 @@ if DJANGO_VERSION >= (1, 7):
                 super(GoogleDriveStorage, self).deconstruct()
             if self._service_email is not None:
                 kwargs["service_email"] = self._service_email
-            if self._key is not None:
-                kwargs["private_key"] = self._key
-            if self._user_email is not None:
-                kwargs["user_email"] = self._user_email
+            if self._json_keyfile_path is not None:
+                kwargs["json_keyfile_path"] = self._json_keyfile_path

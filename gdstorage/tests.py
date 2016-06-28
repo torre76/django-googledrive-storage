@@ -10,14 +10,12 @@ class GoogleDriveStorageTest(TestCase):
         gds = GoogleDriveStorage()
         file_data = gds._check_file_exists("How to get started with Drive")
         pprint(file_data)
-        print "\n\n"
         self.assertIsNotNone(file_data, u"Unable to find file 'How to get started with Drive'")
 
     def test_check_or_create_folder(self):
         gds = GoogleDriveStorage()
         folder_data = gds._get_or_create_folder("test4/folder")
         pprint(folder_data)
-        print "\n\n"
         self.assertIsNotNone(folder_data, u"Unable to find or create folder 'test4/folder")
 
     def _test_upload_file(self):

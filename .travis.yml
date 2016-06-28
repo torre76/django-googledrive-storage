@@ -7,6 +7,8 @@ python:
 - '3.5'
 install:
   - python setup.py install
+  - django-admin.py startproject gdtest
+  - /bin/cp -av test/settings.py gdtest/gdtest/
 script:
   - python manage.py test
 before_install:

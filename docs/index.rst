@@ -23,7 +23,7 @@ Prerequisites
 To use this storage, you have to:
 
 * `set up a project and application in the Google Developers Console <https://console.developers.google.com/flows/enableapi?apiid=drive>`_
-* `obtain the json private key file (*OAuth 2.0 for Server to Server Applications*) for your Google Project associated with Google Drive service <https://developers.google.com/identity/protocols/OAuth2ServiceAccount>`_
+* `obtain the json private key file (OAuth 2.0 for Server to Server Applications) for your Google Project associated with Google Drive service <https://developers.google.com/identity/protocols/OAuth2ServiceAccount>`_
 
 Installation
 ************

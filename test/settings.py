@@ -119,3 +119,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/dev/howto/static-files/
 
 STATIC_URL = '/static/'
+
+#
+# Google Drive Storage Settings
+#
+GOOGLE_DRIVE_STORAGE_JSON_KEY_FILE = os.path.join(BASE_DIR, "test", "gdstorage.json")
+GOOGLE_DRIVE_STORAGE_SERVICE_EMAIL = '61034839021-r18v4c9k072dud32iook8pv8meaie8vv@developer.gserviceaccount.com'

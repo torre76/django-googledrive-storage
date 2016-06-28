@@ -28,32 +28,25 @@ class GoogleDriveStorage(Storage):
     _UNKNOWN_MIMETYPE_ = "application/octet-stream"
     _GOOGLE_DRIVE_FOLDER_MIMETYPE_ = "application/vnd.google-apps.folder"
 
-    def __init__(self, service_email=None, private_key=None, user_email=None):
+    def __init__(self, service_email=None, json_keyfile_path=None):
         """
         Handles credentials and builds the google service.
 
         :param service_email: String
-        :param private_key: Path
+        :param _json_keyfile_path: Path
         :param user_email: String
         :raise ValueError:
         """
         self._service_email = service_email or settings.GOOGLE_DRIVE_STORAGE_SERVICE_EMAIL
-        self._key = private_key or settings.GOOGLE_DRIVE_STORAGE_KEY
+        self._json_keyfile_path = json_keyfile_path or settings.GOOGLE_DRIVE_STORAGE_JSON_KEY_FILE
 
-        kwargs = {}
-        if user_email or settings.GOOGLE_DRIVE_STORAGE_USER_EMAIL:
-            self._user_email = kwargs['sub'] = user_email or settings.GOOGLE_DRIVE_STORAGE_USER_EMAIL
-        credentials = ServiceAccountCredentials(
-            self._service_email,
-            self._key,
-            scope="https://www.googleapis.com/auth/drive",
-            **kwargs
-        )
+        credentials = ServiceAccountCredentials.from_json_keyfile_name(self._json_keyfile_path,
+                                                                       scopes=["https://www.googleapis.com/auth/drive"])
+
         http = httplib2.Http()
         http = credentials.authorize(http)
 
         self._drive_service = build('drive', 'v2', http=http)
-
 
     def _split_path(self, p):
         """

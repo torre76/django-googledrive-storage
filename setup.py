@@ -27,10 +27,11 @@ setup(
         "oauth2client >= 2.2.0"
     ],      
     classifiers=[
-        "Development Status :: 4 - Beta",
+        "Development Status :: 5 - Production/Stable",
         "Framework :: Django",
         "License :: OSI Approved :: BSD License",
         "Programming Language :: Python :: 2.7",
-        "Programming Language :: Python :: 2 :: Only"
+        "Programming Language :: Python :: 3.4",
+        "Programming Language :: Python :: 3.5"
     ],
 )

@@ -23,7 +23,7 @@ Prerequisites
 To use this storage, you have to:
 
 * `set up a project and application in the Google Developers Console <https://console.developers.google.com/flows/enableapi?apiid=drive>`_
-* `obtain the key (service account) for your Google Project associated with Google Drive service <https://developers.google.com/drive/web/delegation>`_
+* `obtain the json private key file (*OAuth 2.0 for Server to Server Applications*) for your Google Project associated with Google Drive service <https://developers.google.com/identity/protocols/OAuth2ServiceAccount>`_
 
 Installation
 ************
@@ -58,19 +58,11 @@ Once installed, there are a few steps to configure the storage:
    # Google Drive Storage Settings
    #
 
-   GOOGLE_DRIVE_STORAGE_KEY = '<your private key as a string>'
+   GOOGLE_DRIVE_STORAGE_JSON_KEY_FILE = '<path to your json private key file>'
    GOOGLE_DRIVE_STORAGE_SERVICE_EMAIL = '<your service mail>'
 
 The `GOOGLE_DRIVE_STORAGE_SERVICE_EMAIL` should be the email Google assigned to your project,
-while the `GOOGLE_DRIVE_STORAGE_KEY` must be the *private key as a string* obtained by Google.
-
-Since Google will provide you an *encrypted p12* file, to obtain the private key you can use the following command:
-
-.. code-block:: bash
-
-   openssl pkcs12 -in <p12_file> -out <key_file> -nocerts -nodes
-
-You also have to **provide the password that Google shows you when the p12 certificate has been created** [#google_key]_.
+while the `GOOGLE_DRIVE_STORAGE_JSON_KEY_FILE` must be the path to *private json key file* obtained by Google.
 
 .. note::
 
@@ -107,7 +99,3 @@ Source and License
 
 Source can be found on `GitHub <https://github.com/torre76/django-googledrive-storage>`_ with its included
 `license <https://github.com/torre76/django-googledrive-storage/blob/master/LICENSE.txt>`_.
-
-.. rubric:: Footnotes
-
-.. [#google_key] Usually the password used by Google is ``notasecret`` but it will eventually changes in future

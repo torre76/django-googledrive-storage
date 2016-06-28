@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from django.test import TestCase
 from gdstorage.storage import GoogleDriveStorage
 import os.path
@@ -10,17 +12,17 @@ class GoogleDriveStorageTest(TestCase):
         gds = GoogleDriveStorage()
         file_data = gds._check_file_exists("How to get started with Drive")
         pprint(file_data)
-        self.assertIsNotNone(file_data, u"Unable to find file 'How to get started with Drive'")
+        self.assertIsNotNone(file_data, "Unable to find file 'How to get started with Drive'")
 
     def test_check_or_create_folder(self):
         gds = GoogleDriveStorage()
         folder_data = gds._get_or_create_folder("test4/folder")
         pprint(folder_data)
-        self.assertIsNotNone(folder_data, u"Unable to find or create folder 'test4/folder")
+        self.assertIsNotNone(folder_data, "Unable to find or create folder 'test4/folder")
 
     def _test_upload_file(self):
         gds = GoogleDriveStorage()
-        file_name = u"{0}{1}{2}".format(os.path.dirname(os.path.abspath(__file__)), os.path.sep,
+        file_name = "{0}{1}{2}".format(os.path.dirname(os.path.abspath(__file__)), os.path.sep,
                                         "../test/gdrive_logo.png")
         result = gds.save("/test4/gdrive_logo.png", open(file_name, 'rb'))
         pprint(result)
@@ -32,7 +34,7 @@ class GoogleDriveStorageTest(TestCase):
         (directories, files) = gds.listdir("/test4")
         pprint(directories)
         pprint(files)
-        self.assertTrue(len(files) > 0, u"Unable to read directory data")
+        self.assertTrue(len(files) > 0, "Unable to read directory data")
 
     def test_open_file(self):
         self._test_list_folder()

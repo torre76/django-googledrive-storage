@@ -9,6 +9,7 @@ install:
   - python setup.py install
   - django-admin.py startproject gdtest
   - /bin/cp -av test/settings.py gdtest/gdtest/
+  - /bin/cp -av gdstorage/tests.py gdtest/gdtest/
   - /bin/cp -av test/ gdtest/
 
 script:

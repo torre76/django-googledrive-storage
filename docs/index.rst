@@ -67,7 +67,7 @@ while the `GOOGLE_DRIVE_STORAGE_JSON_KEY_FILE` must be the path to *private json
 .. note::
 
    **Django Google Drive Storage** is using `Django Appconf <http://django-appconf.readthedocs.org/>`_ to handle
-   settings, so you can setup `GOOGLE_DRIVE_STORAGE_KEY` as an environment variable outside the Django app.
+   settings, so you can setup `GOOGLE_DRIVE_STORAGE_JSON_KEY_FILE` as an environment variable outside the Django app.
 
    This will increase security to your environment.
 

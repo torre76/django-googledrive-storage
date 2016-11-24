@@ -30,7 +30,8 @@ class GoogleDriveStorage(Storage):
     _UNKNOWN_MIMETYPE_ = "application/octet-stream"
     _GOOGLE_DRIVE_FOLDER_MIMETYPE_ = "application/vnd.google-apps.folder"
 
-    def __init__(self, service_email=None, json_keyfile_path=None):
+    def __init__(self, service_email=None, json_keyfile_path=None,
+                 permission={'type': 'anyone', 'role': 'reader'}):
         """
         Handles credentials and builds the google service.
 
@@ -174,12 +175,8 @@ class GoogleDriveStorage(Storage):
             body=body,
             media_body=media_body).execute()
 
-        # Setting up public permission
-        public_permission = {
-            'type': 'anyone',
-            'role': 'reader'
-        }
-        self._drive_service.permissions().insert(fileId=file_data["id"], body=public_permission).execute()
+        # Setting up permission
+        self._drive_service.permissions().insert(fileId=file_data["id"], body=self.permission).execute()
 
         return file_data[u'originalFilename']
 

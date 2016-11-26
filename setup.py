@@ -14,6 +14,7 @@ INSTALL_REQUIRES = [
     "requests >= 2.10.0",
     "django-appconf >= 1.0.2",
     "oauth2client >= 2.2.0",
+    "six >= 1.10.0"
     ""
 ]
 

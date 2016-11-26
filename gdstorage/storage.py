@@ -1,22 +1,158 @@
 from __future__ import unicode_literals
 
-from io import BytesIO
 import mimetypes
+import os.path
+from io import BytesIO
 
+import django
+import enum
+import httplib2
+import six
 from apiclient.discovery import build
 from apiclient.http import MediaIoBaseUpload
 from dateutil.parser import parse
-import django
 from django.conf import settings
 from django.core.files import File
 from django.core.files.storage import Storage
-import httplib2
 from oauth2client.service_account import ServiceAccountCredentials
-import os.path
-import requests
-
 
 DJANGO_VERSION = django.VERSION[:2]
+
+
+class GoogleDrivePermissionType(enum.Enum):
+    """
+        Describe a permission type for Google Drive as described on
+        `Drive docs <https://developers.google.com/drive/v3/reference/permissions>`_
+    """
+
+    USER = "user"
+    """
+        Permission for single user
+    """
+
+    GROUP = "group"
+    """
+        Permission for group defined in Google Drive
+    """
+
+    DOMAIN = "domain"
+    """
+        Permission for domain defined in Google Drive
+    """
+
+    ANYONE = "anyone"
+    """
+        Permission for anyone
+    """
+
+
+class GoogleDrivePermissionRole(enum.Enum):
+    """
+        Describe a permission role for Google Drive as described on
+        `Drive docs <https://developers.google.com/drive/v3/reference/permissions>`_
+    """
+
+    OWNER = "owner"
+    """
+        File Owner
+    """
+
+    READER = "reader"
+    """
+        User can read a file
+    """
+
+    WRITER = "writer"
+    """
+        User can write a file
+    """
+
+    COMMENTER = "commenter"
+    """
+        User can comment a file
+    """
+
+
+class GoogleDriveFilePermission(object):
+    """
+        Describe a permission for Google Drive as described on
+        `Drive docs <https://developers.google.com/drive/v2/reference/permissions>`_
+
+        :param gdstorage.GoogleDrivePermissionRole g_role: Role associated to this permission
+        :param gdstorage.GoogleDrivePermissionType g_type: Type associated to this permission
+        :param str g_value: email address that qualifies the User associated to this permission
+
+    """
+
+    @property
+    def role(self):
+        """
+            Role associated to this permission
+
+            :return: Enumeration that states the role associated to this permission
+            :rtype: gdstorage.GoogleDrivePermissionRole
+        """
+        return self._role
+
+    @property
+    def type(self):
+        """
+            Type associated to this permission
+
+            :return: Enumeration that states the role associated to this permission
+            :rtype: gdstorage.GoogleDrivePermissionType
+        """
+        return self._type
+
+    @property
+    def value(self):
+        """
+            Email that qualifies the user associated to this permission
+            :return: Email as string
+            :rtype: str
+        """
+        return self._value
+
+    @property
+    def raw(self):
+        """
+            Transform the :class:`.GoogleDriveFilePermission` instance into a string used to issue the command to
+            Google Drive API
+
+            :return: Dictionary that states a permission compliant with Google Drive API
+            :rtype: dict
+        """
+
+        result = {
+            "role": self.role.value,
+            "type": self.type.value
+        }
+
+        if self.value is not None:
+            result["value"] = self.value
+
+        return result
+
+    def __init__(self, g_role, g_type, g_value=None):
+        """
+            Instantiate this class
+        """
+        if not isinstance(g_role, GoogleDrivePermissionRole):
+            raise ValueError("Role should be a GoogleDrivePermissionRole instance")
+        if not isinstance(g_type, GoogleDrivePermissionType):
+            raise ValueError("Permission should be a GoogleDrivePermissionType instance")
+        if g_value is not None and not isinstance(g_value, six.string_types):
+            raise ValueError("Value should be a String instance")
+
+        self._role = g_role
+        self._type = g_type
+        self._value = g_value
+
+
+_ANYONE_CAN_READ_PERMISSION_ = GoogleDriveFilePermission(
+    GoogleDrivePermissionRole.READER,
+    GoogleDrivePermissionType.ANYONE
+)
 
 
 class GoogleDriveStorage(Storage):
@@ -31,7 +167,7 @@ class GoogleDriveStorage(Storage):
     _GOOGLE_DRIVE_FOLDER_MIMETYPE_ = "application/vnd.google-apps.folder"
 
     def __init__(self, service_email=None, json_keyfile_path=None,
-                 permission={'type': 'anyone', 'role': 'reader'}):
+                 permissions=None):
         """
         Handles credentials and builds the google service.
 
@@ -49,7 +185,19 @@ class GoogleDriveStorage(Storage):
         http = httplib2.Http()
         http = credentials.authorize(http)
 
-        self._permission = permission
+        self._permissions = None
+        if permissions is None:
+            self._permissions = (_ANYONE_CAN_READ_PERMISSION_,)
+        else:
+            if not isinstance(permissions, (tuple, list,)):
+                raise ValueError("Permissions should be a list or a tuple of GoogleDriveFilePermission instances")
+            else:
+                for p in permissions:
+                    if not isinstance(p, GoogleDriveFilePermission):
+                        raise ValueError(
+                            "Permissions should be a list or a tuple of GoogleDriveFilePermission instances")
+                # Ok, permissions are good
+                self._permissions = permissions
 
         self._drive_service = build('drive', 'v2', http=http)
 
@@ -118,7 +266,7 @@ class GoogleDriveStorage(Storage):
             # If so call the method recursively with next portion of path
             # Otherwise the path does not exists hence the file does not exists
             q = "mimeType = '{0}' and title = '{1}'".format(self._GOOGLE_DRIVE_FOLDER_MIMETYPE_,
-                                                             split_filename[0])
+                                                            split_filename[0])
             if parent_id is not None:
                 q = "{0} and '{1}' in parents".format(q, parent_id)
             max_results = 1000  # Max value admitted from google drive
@@ -177,8 +325,9 @@ class GoogleDriveStorage(Storage):
             body=body,
             media_body=media_body).execute()
 
-        # Setting up permission
-        self._drive_service.permissions().insert(fileId=file_data["id"], body=self._permission).execute()
+        # Setting up permissions
+        for p in self._permissions:
+            self._drive_service.permissions().insert(fileId=file_data["id"], body=p.raw).execute()
 
         return file_data[u'originalFilename']
 
@@ -209,10 +358,12 @@ class GoogleDriveStorage(Storage):
             folder_id = self._check_file_exists(path)
         if folder_id:
             file_params = {
-                'q': "'{0}' in parents and mimeType != '{1}'".format(folder_id["id"], self._GOOGLE_DRIVE_FOLDER_MIMETYPE_),
+                'q': "'{0}' in parents and mimeType != '{1}'".format(folder_id["id"],
+                                                                     self._GOOGLE_DRIVE_FOLDER_MIMETYPE_),
             }
             dir_params = {
-                'q': "'{0}' in parents and mimeType = '{1}'".format(folder_id["id"], self._GOOGLE_DRIVE_FOLDER_MIMETYPE_),
+                'q': "'{0}' in parents and mimeType = '{1}'".format(folder_id["id"],
+                                                                    self._GOOGLE_DRIVE_FOLDER_MIMETYPE_),
             }
             files_list = self._drive_service.files().list(**file_params).execute()
             dir_list = self._drive_service.files().list(**dir_params).execute()
@@ -275,6 +426,7 @@ class GoogleDriveStorage(Storage):
 
 if DJANGO_VERSION >= (1, 7):
     from django.utils.deconstruct import deconstructible
+
 
     @deconstructible
     class GoogleDriveStorage(GoogleDriveStorage):

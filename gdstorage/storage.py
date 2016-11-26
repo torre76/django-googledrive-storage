@@ -76,7 +76,7 @@ class GoogleDrivePermissionRole(enum.Enum):
 class GoogleDriveFilePermission(object):
     """
         Describe a permission for Google Drive as described on
-        `Drive docs <https://developers.google.com/drive/v2/reference/permissions>`_
+        `Drive docs <https://developers.google.com/drive/v3/reference/permissions>`_
 
         :param gdstorage.GoogleDrivePermissionRole g_role: Role associated to this permission
         :param gdstorage.GoogleDrivePermissionType g_type: Type associated to this permission

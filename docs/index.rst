@@ -94,8 +94,45 @@ Once configured, it can be used as storage space associated with Django:
        map_name = models.CharField(max_length=200)
        map_data = models.FileField(upload_to='/maps', storage=gd_storage)
 
+File permissions
+****************
+
+Using the storage this way, all files will be saved as publicly available for read (which is the most common use case),
+but sometimes you could have different reason to use Google Storage.
+
+It is possible to specify a set of file permissions [#google_drive_permissions]_ to change how the file could be read or
+written.
+
+This code block will assign read only capabilities only to the user identified by `foo@mailinator.com`.
+
+.. code-block:: python
+
+   from gdstorage.storage import GoogleDriveStorage, GoogleDrivePermissionType, GoogleDrivePermissionRole, GoogleDriveFilePermission
+
+   permission =  GoogleDriveFilePermission(
+      GoogleDrivePermissionRole.READER,
+      GoogleDrivePermissionType.USER,
+      "foo@mailinator.com"
+   )
+
+   gd_storage = GoogleDriveStorage(permissions=(permission, ))
+
+   class Map(models.Model):
+       id = models.AutoField( primary_key=True)
+       map_name = models.CharField(max_length=200)
+       map_data = models.FileField(upload_to='/maps', storage=gd_storage)
+
+.. note::
+
+   Thanks to `Anna Sirota <https://github.com/anka-sirota>`_ for her contribution
+
 Source and License
 ******************
 
 Source can be found on `GitHub <https://github.com/torre76/django-googledrive-storage>`_ with its included
 `license <https://github.com/torre76/django-googledrive-storage/blob/master/LICENSE.txt>`_.
+
+
+.. rubric:: Footnotes
+
+.. [#google_drive_permissions] A detailed explanation of Google Drive API permission can be found `here <https://developers.google.com/drive/v3/reference/permissions>`_.

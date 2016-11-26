@@ -49,6 +49,8 @@ class GoogleDriveStorage(Storage):
         http = httplib2.Http()
         http = credentials.authorize(http)
 
+        self._permission = permission
+
         self._drive_service = build('drive', 'v2', http=http)
 
     def _split_path(self, p):
@@ -176,7 +178,7 @@ class GoogleDriveStorage(Storage):
             media_body=media_body).execute()
 
         # Setting up permission
-        self._drive_service.permissions().insert(fileId=file_data["id"], body=self.permission).execute()
+        self._drive_service.permissions().insert(fileId=file_data["id"], body=self._permission).execute()
 
         return file_data[u'originalFilename']
 

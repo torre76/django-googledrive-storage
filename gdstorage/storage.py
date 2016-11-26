@@ -166,17 +166,15 @@ class GoogleDriveStorage(Storage):
     _UNKNOWN_MIMETYPE_ = "application/octet-stream"
     _GOOGLE_DRIVE_FOLDER_MIMETYPE_ = "application/vnd.google-apps.folder"
 
-    def __init__(self, service_email=None, json_keyfile_path=None,
+    def __init__(self, json_keyfile_path=None,
                  permissions=None):
         """
         Handles credentials and builds the google service.
 
-        :param service_email: String
         :param _json_keyfile_path: Path
         :param user_email: String
         :raise ValueError:
         """
-        self._service_email = service_email or settings.GOOGLE_DRIVE_STORAGE_SERVICE_EMAIL
         self._json_keyfile_path = json_keyfile_path or settings.GOOGLE_DRIVE_STORAGE_JSON_KEY_FILE
 
         credentials = ServiceAccountCredentials.from_json_keyfile_name(self._json_keyfile_path,

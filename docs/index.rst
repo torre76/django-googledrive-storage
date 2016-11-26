@@ -59,10 +59,8 @@ Once installed, there are a few steps to configure the storage:
    #
 
    GOOGLE_DRIVE_STORAGE_JSON_KEY_FILE = '<path to your json private key file>'
-   GOOGLE_DRIVE_STORAGE_SERVICE_EMAIL = '<your service mail>'
 
-The `GOOGLE_DRIVE_STORAGE_SERVICE_EMAIL` should be the email Google assigned to your project,
-while the `GOOGLE_DRIVE_STORAGE_JSON_KEY_FILE` must be the path to *private json key file* obtained by Google.
+The `GOOGLE_DRIVE_STORAGE_JSON_KEY_FILE` must be the path to *private json key file* obtained by Google.
 
 .. note::
 

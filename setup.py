@@ -28,7 +28,7 @@ else:
 
 setuptools.setup(
     name="django-googledrive-storage",
-    version="1.2.0",
+    version="1.3.0",
     author="Gian Luca Dalla Torre",
     author_email="gianluca.dallatorre@gmail.com",
     description=("Storage implementation for Django that interacts with Google Drive"),

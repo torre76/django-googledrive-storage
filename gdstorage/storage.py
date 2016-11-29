@@ -314,7 +314,8 @@ class GoogleDriveStorage(Storage):
         media_body = MediaIoBaseUpload(fd, mime_type, resumable=True)
         body = {
             'title': name,
-            'mimeType': mime_type
+            'mimeType': mime_type,
+            'permissions': [p.raw for p in self._permissions]
         }
         # Set the parent folder.
         if parent_id:
@@ -322,10 +323,6 @@ class GoogleDriveStorage(Storage):
         file_data = self._drive_service.files().insert(
             body=body,
             media_body=media_body).execute()
-
-        # Setting up permissions
-        for p in self._permissions:
-            self._drive_service.permissions().insert(fileId=file_data["id"], body=p.raw).execute()
 
         return file_data[u'originalFilename']
 

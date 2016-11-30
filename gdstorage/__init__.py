@@ -7,6 +7,6 @@ class GoogleDriveStorageConf(AppConf):
 
     class Meta:
         prefix = 'GOOGLE_DRIVE_STORAGE'
-        required = ['JSON_KEY_FILE', 'SERVICE_EMAIL']
+        required = ['JSON_KEY_FILE']
 
     USER_EMAIL = None

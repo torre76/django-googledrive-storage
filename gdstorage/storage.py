@@ -327,7 +327,7 @@ class GoogleDriveStorage(Storage):
         for p in self._permissions:
             self._drive_service.permissions().insert(fileId=file_data["id"], body=p.raw).execute()
 
-        return file_data[u'originalFilename']
+        return file_data.get(u'originalFilename', file_data.get(u'title'))
 
     def delete(self, name):
         """

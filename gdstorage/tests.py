@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+import os
 import os.path
 from pprint import pprint
 
@@ -65,7 +66,7 @@ class GoogleDriveStorageTest(TestCase):
                                                       "foo@mailinator.com")
         read_only_to_anyone = GoogleDriveFilePermission(GoogleDrivePermissionRole.READER,
                                                         GoogleDrivePermissionType.ANYONE)
-        gds = GoogleDriveStorage(permissions=(full_write_to_foo, read_only_to_anyone, ))
+        gds = GoogleDriveStorage(permissions=(full_write_to_foo, read_only_to_anyone,))
         file_name = "{0}{1}{2}".format(os.path.dirname(os.path.abspath(__file__)), os.path.sep,
                                        "../test/gdrive_logo.png")
         result = gds.save("/test4/gdrive_logo.png", open(file_name, 'rb'))
@@ -75,3 +76,25 @@ class GoogleDriveStorageTest(TestCase):
         pprint(f)
         pprint(len(f))
         self.assertIsNotNone(f, "Unable to load data from Google Drive")
+
+    def test_upload_big_file(self):
+        gds = GoogleDriveStorage()
+        file_name = "{0}{1}{2}".format(os.path.dirname(os.path.abspath(__file__)), os.path.sep,
+                                       "../test/huge_file")
+        with open(file_name, "wb") as out:
+            out.truncate(1024 * 1024 * 20)
+
+        result = gds.save("/test5/huge_file", open(file_name, 'rb'))
+        pprint(result)
+        self.assertIsNotNone(result, u'Unable to upload file to Google Drive')
+
+        os.remove(file_name)
+
+    def test_open_big_file(self):
+        self._test_list_folder()
+        gds = GoogleDriveStorage()
+        f = gds.open(u'/test5/huge_file', "rb")
+        pprint(f)
+        pprint(len(f))
+        self.assertIsNotNone(f, "Unable to load data from Google Drive")
+

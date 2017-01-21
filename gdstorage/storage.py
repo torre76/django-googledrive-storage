@@ -312,11 +312,10 @@ class GoogleDriveStorage(Storage):
         parent_id = None if folder_data is None else folder_data['id']
         # Now we had created (or obtained) folder on GDrive
         # Upload the file
-        fd = BytesIO(content.file.read())
         mime_type = mimetypes.guess_type(name)
         if mime_type[0] is None:
             mime_type = self._UNKNOWN_MIMETYPE_
-        media_body = MediaIoBaseUpload(fd, mime_type, resumable=True)
+        media_body = MediaIoBaseUpload(content.file, mime_type, resumable=True, chunksize=1024*512)
         body = {
             'title': name,
             'mimeType': mime_type

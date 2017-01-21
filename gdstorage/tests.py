@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import os
 import os.path
+import time
 from pprint import pprint
 
 from django.test import TestCase
@@ -15,12 +16,14 @@ class GoogleDriveStorageTest(TestCase):
         file_data = gds._check_file_exists("How to get started with Drive")
         pprint(file_data)
         self.assertIsNotNone(file_data, "Unable to find file 'How to get started with Drive'")
+        time.sleep(10)
 
     def test_check_or_create_folder(self):
         gds = GoogleDriveStorage()
         folder_data = gds._get_or_create_folder("test4/folder")
         pprint(folder_data)
         self.assertIsNotNone(folder_data, "Unable to find or create folder 'test4/folder")
+        time.sleep(10)
 
     def _test_upload_file(self):
         gds = GoogleDriveStorage()
@@ -38,7 +41,7 @@ class GoogleDriveStorageTest(TestCase):
         pprint(files)
         self.assertTrue(len(files) > 0, "Unable to read directory data")
 
-    def test_open_file(self):
+    def _test_open_file(self):
         self._test_list_folder()
         gds = GoogleDriveStorage()
         f = gds.open(u'/test4/gdrive_logo.png', "rb")
@@ -59,6 +62,7 @@ class GoogleDriveStorageTest(TestCase):
         pprint(f)
         pprint(len(f))
         self.assertIsNotNone(f, "Unable to load data from Google Drive")
+        time.sleep(10)
 
     def test_multiple_permission(self):
         full_write_to_foo = GoogleDriveFilePermission(GoogleDrivePermissionRole.WRITER,
@@ -76,6 +80,7 @@ class GoogleDriveStorageTest(TestCase):
         pprint(f)
         pprint(len(f))
         self.assertIsNotNone(f, "Unable to load data from Google Drive")
+        time.sleep(10)
 
     def test_upload_big_file(self):
         gds = GoogleDriveStorage()
@@ -90,6 +95,8 @@ class GoogleDriveStorageTest(TestCase):
 
         os.remove(file_name)
 
+        time.sleep(10)
+
     def test_open_big_file(self):
         self._test_list_folder()
         gds = GoogleDriveStorage()
@@ -97,4 +104,5 @@ class GoogleDriveStorageTest(TestCase):
         pprint(f)
         pprint(len(f))
         self.assertIsNotNone(f, "Unable to load data from Google Drive")
+        time.sleep(10)
 

@@ -227,21 +227,26 @@ class GoogleDriveStorage(Storage):
         if folder_data is None:
             # Folder does not exists, have to create
             split_path = self._split_path(path)
-            current_folder_data = None
-            for p in split_path:
-                meta_data = {
-                    'title': p,
-                    'mimeType': self._GOOGLE_DRIVE_FOLDER_MIMETYPE_
-                }
-                if current_folder_data is not None:
-                    meta_data['parents'] = [{'id': current_folder_data['id']}]
-                else:
-                    # This is the first iteration loop so we have to set the parent_id
-                    # obtained by the user, if available
-                    if parent_id is not None:
-                        meta_data['parents'] = [{'id': parent_id}]
-                current_folder_data = self._drive_service.files().insert(body=meta_data).execute()
-            return current_folder_data
+
+            if split_path[:-1]:
+                parent_path = os.path.join(*split_path[:-1])
+                current_folder_data = self._get_or_create_folder(parent_path, parent_id=parent_id)
+            else:
+                current_folder_data = None
+
+            meta_data = {
+                'title': split_path[-1],
+                'mimeType': self._GOOGLE_DRIVE_FOLDER_MIMETYPE_
+            }
+            if current_folder_data is not None:
+                meta_data['parents'] = [{'id': current_folder_data['id']}]
+            else:
+                # This is the first iteration loop so we have to set the parent_id
+                # obtained by the user, if available
+                if parent_id is not None:
+                    meta_data['parents'] = [{'id': parent_id}]
+            current_folder_data = self._drive_service.files().insert(body=meta_data).execute()
+            return current_folder_data    
         else:
             return folder_data
 

@@ -10,3 +10,4 @@ class GoogleDriveStorageConf(AppConf):
         required = ['JSON_KEY_FILE']
 
     USER_EMAIL = None
+    AUTO_CONVERT_MIMETYPES = []

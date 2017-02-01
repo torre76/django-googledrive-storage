@@ -325,7 +325,9 @@ class GoogleDriveStorage(Storage):
             body['parents'] = [{'id': parent_id}]
         file_data = self._drive_service.files().insert(
             body=body,
-            media_body=media_body).execute()
+            media_body=media_body,
+            convert=True if mime_type[0] in settings.GOOGLE_DRIVE_STORAGE_AUTO_CONVERT_MIMETYPES else False,
+        ).execute()
 
         # Setting up permissions
         for p in self._permissions:

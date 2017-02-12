@@ -16,6 +16,7 @@ from django.core.files import File
 from django.core.files.storage import Storage
 from oauth2client.service_account import ServiceAccountCredentials
 
+
 DJANGO_VERSION = django.VERSION[:2]
 
 
@@ -443,3 +444,13 @@ if DJANGO_VERSION >= (1, 7):
                 kwargs["service_email"] = self._service_email
             if self._json_keyfile_path is not None:
                 kwargs["json_keyfile_path"] = self._json_keyfile_path
+
+    @deconstructible
+    class GoogleDriveFilePermission(GoogleDriveFilePermission):
+        def deconstruct(self):
+            """
+            Add a deconstructor to make the object serializable inorder to support migration
+            
+            """
+            name, path, args, kwargs = \
+                super(GoogleDriveFilePermission,self).deconstruct()

@@ -8,7 +8,6 @@ long_description = codecs.open('README.rst', "r").read()
 # See https://hynek.me/articles/conditional-python-dependencies/
 
 INSTALL_REQUIRES = [
-    "Django >= 1.7",
     "google-api-python-client >= 1.5.1",
     "python-dateutil >= 2.5.3",
     "requests >= 2.10.0",
@@ -23,6 +22,11 @@ EXTRAS_REQUIRE = dict()
 if int(setuptools.__version__.split(".", 1)[0]) < 18:
     if sys.version_info[0:2] < (3, 4):
         INSTALL_REQUIRES.append("enum34 >= 1.1.6")
+        INSTALL_REQUIRES.append("Django >= 1.7, < 2")
+    elif sys.version_info[0:2] == (3, 4):
+        INSTALL_REQUIRES.append("Django >= 1.7, <= 2")
+    else:
+        INSTALL_REQUIRES.append("Django >= 1.7")
 else:
     EXTRAS_REQUIRE[":python_version<'3.4'"] = ["enum34 >= 1.1.6"]
 

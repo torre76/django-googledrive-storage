@@ -22,11 +22,11 @@ EXTRAS_REQUIRE = dict()
 if int(setuptools.__version__.split(".", 1)[0]) < 18:
     if sys.version_info[0:2] < (3, 4):
         INSTALL_REQUIRES.append("enum34 >= 1.1.6")
-        INSTALL_REQUIRES.append("Django >= 1.7, < 2")
+        INSTALL_REQUIRES.insert(0, "Django >= 1.7, < 2")
     elif sys.version_info[0:2] == (3, 4):
-        INSTALL_REQUIRES.append("Django >= 1.7, <= 2")
+        INSTALL_REQUIRES.insert(0, "Django >= 1.7, <= 2")
     else:
-        INSTALL_REQUIRES.append("Django >= 1.7")
+        INSTALL_REQUIRES.insert(0, "Django >= 1.7")
 else:
     EXTRAS_REQUIRE[":python_version<'3.4'"] = ["enum34 >= 1.1.6"]
 

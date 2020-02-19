@@ -321,7 +321,8 @@ class GoogleDriveStorage(Storage):
 
         # Setting up permissions
         for p in self._permissions:
-            self._drive_service.permissions().create(fileId=file_data["id"], body={**p.raw}).execute()
+            self._drive_service.permissions().create(fileId=file_data["id"],
+                                                     body={**p.raw}).execute()
 
         return file_data.get(u'originalFilename', file_data.get(u'name'))
 
@@ -365,7 +366,7 @@ class GoogleDriveStorage(Storage):
             dir_list = dir_results.get('files', [])
             for element in files_list:
                 files.append(os.path.join(path, element["name"]))
-            for element in dir_list["items"]:
+            for element in dir_list:
                 directories.append(os.path.join(path, element["name"]))
         return directories, files
 
@@ -438,6 +439,7 @@ if DJANGO_VERSION >= (1, 7):
             if self._json_keyfile_path is not None:
                 kwargs["json_keyfile_path"] = self._json_keyfile_path
 
+
     @deconstructible
     class GoogleDriveFilePermission(GoogleDriveFilePermission):
         def deconstruct(self):
@@ -446,4 +448,4 @@ if DJANGO_VERSION >= (1, 7):
 
             """
             name, path, args, kwargs = \
-                super(GoogleDriveFilePermission,self).deconstruct()
+                super(GoogleDriveFilePermission, self).deconstruct()

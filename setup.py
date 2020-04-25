@@ -13,51 +13,32 @@ INSTALL_REQUIRES = [
     "requests >= 2.10.0",
     "django-appconf >= 1.0.2",
     "oauth2client >= 2.2.0",
-    "six >= 1.10.0"
-    ""
+    "six >= 1.10.0",
+    "Django >= 3.0"
 ]
-
-EXTRAS_REQUIRE = dict()
-
-# Handles Django - Python versions
-if sys.version_info[0:2] < (3, 4):
-    INSTALL_REQUIRES.insert(0, "Django >= 1.7, < 2")
-elif sys.version_info[0:2] == (3, 4):
-    INSTALL_REQUIRES.insert(0, "Django >= 1.7, <= 2")
-else:
-    INSTALL_REQUIRES.insert(0, "Django >= 1.7")
-
-if int(setuptools.__version__.split(".", 1)[0]) < 18:
-    if sys.version_info[0:2] < (3, 4):
-        INSTALL_REQUIRES.append("enum34 >= 1.1.6")
-else:
-    EXTRAS_REQUIRE[":python_version<'3.4'"] = ["enum34 >= 1.1.6"]
 
 setuptools.setup(
     name="django-googledrive-storage",
-    version="1.3.5",
+    version="1.4.0",
     author="Gian Luca Dalla Torre",
     author_email="gianluca.dallatorre@gmail.com",
     description=("Storage implementation for Django that interacts with Google Drive"),
     license="LICENSE.txt",
     keywords="django google drive storage googledrive",
     url="https://github.com/torre76/django-googledrive-storage",
-    download_url="https://github.com/torre76/django-googledrive-storage/tarball/1.3.5",
+    download_url="https://github.com/torre76/django-googledrive-storage/tarball/1.4.0",
     packages=setuptools.find_packages(exclude=["django_googledrive_storage", "gdstorage.tests", "docs"]),
     long_description=long_description,
     package_data={
         '': ['README.rst'],
     },
     install_requires=INSTALL_REQUIRES,
-    extras_require=EXTRAS_REQUIRE,
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Framework :: Django",
         "License :: OSI Approved :: BSD License",
-        "Programming Language :: Python :: 2.7",
-        "Programming Language :: Python :: 3.4",
-        "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
-        "Programming Language :: Python :: 3.7"
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8"
     ],
 )

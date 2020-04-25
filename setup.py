@@ -8,7 +8,7 @@ long_description = codecs.open('README.rst', "r").read()
 # See https://hynek.me/articles/conditional-python-dependencies/
 
 INSTALL_REQUIRES = [
-    "google-api-python-client >= 1.5.1",
+    "google-api-python-client >= 1.8.2",
     "python-dateutil >= 2.5.3",
     "requests >= 2.10.0",
     "django-appconf >= 1.0.2",

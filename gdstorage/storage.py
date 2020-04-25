@@ -7,8 +7,8 @@ from io import BytesIO
 import django
 import enum
 import six
-from apiclient.discovery import build
-from apiclient.http import MediaIoBaseUpload
+from googleapiclient.discovery import build
+from googleapiclient.http import MediaIoBaseUpload
 from dateutil.parser import parse
 from django.conf import settings
 from django.core.files import File

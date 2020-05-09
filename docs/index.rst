@@ -62,6 +62,9 @@ Once installed, there are a few steps to configure the storage:
 
 The `GOOGLE_DRIVE_STORAGE_JSON_KEY_FILE` must be the path to *private json key file* obtained by Google.
 
+Alternatively, you can place the contents of your json private key file into an environment variable named
+`GOOGLE_DRIVE_STORAGE_JSON_KEY_FILE_CONTENTS`, this requires setting `GOOGLE_DRIVE_STORAGE_JSON_KEY_FILE` to `None`.
+
 .. note::
 
    **Django Google Drive Storage** is using `Django Appconf <http://django-appconf.readthedocs.org/>`_ to handle

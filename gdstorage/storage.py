@@ -299,6 +299,7 @@ class GoogleDriveStorage(Storage):
         return File(BytesIO(content), name)
 
     def _save(self, name, content):
+        name = os.path.join(settings.GOOGLE_DRIVE_STORAGE_MEDIA_ROOT, name)
         folder_path = os.path.sep.join(self._split_path(name)[:-1])
         folder_data = self._get_or_create_folder(folder_path)
         parent_id = None if folder_data is None else folder_data['id']

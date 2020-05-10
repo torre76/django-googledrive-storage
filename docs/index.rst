@@ -59,11 +59,13 @@ Once installed, there are a few steps to configure the storage:
    #
 
    GOOGLE_DRIVE_STORAGE_JSON_KEY_FILE = '<path to your json private key file>'
+   GOOGLE_DRIVE_STORAGE_MEDIA_ROOT = '<base google drive path for file uploads>' # OPTIONAL
 
 The `GOOGLE_DRIVE_STORAGE_JSON_KEY_FILE` must be the path to *private json key file* obtained by Google.
-
 Alternatively, you can place the contents of your json private key file into an environment variable named
 `GOOGLE_DRIVE_STORAGE_JSON_KEY_FILE_CONTENTS`, this requires setting `GOOGLE_DRIVE_STORAGE_JSON_KEY_FILE` to `None`.
+
+The `GOOGLE_DRIVE_STORAGE_MEDIA_ROOT` is analogous to MEDIA_ROOT for django’s built-in FileSystemStorage
 
 .. note::
 
@@ -93,7 +95,13 @@ Once configured, it can be used as storage space associated with Django:
    class Map(models.Model):
        id = models.AutoField( primary_key=True)
        map_name = models.CharField(max_length=200)
-       map_data = models.FileField(upload_to='/maps', storage=gd_storage)
+       map_data = models.FileField(upload_to='maps', storage=gd_storage)
+
+.. note::
+
+    You can get the `upload_to` parameter to ignore `GOOGLE_DRIVE_STORAGE_MEDIA_ROOT` by using an absolute path
+    e.g `/maps`
+
 
 File permissions
 ****************

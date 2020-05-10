@@ -263,40 +263,45 @@ class GoogleDriveStorage(Storage):
         :type parent_id: string
         :returns: dict containing file / folder data if exists or None if does not exists
         """
-        split_filename = self._split_path(filename)
-        if len(split_filename) > 1:
-            # This is an absolute path with folder inside
-            # First check if the first element exists as a folder
-            # If so call the method recursively with next portion of path
-            # Otherwise the path does not exists hence the file does not exists
-            q = "mimeType = '{0}' and name = '{1}'".format(self._GOOGLE_DRIVE_FOLDER_MIMETYPE_,
-                                                            split_filename[0])
-            if parent_id is not None:
-                q = "{0} and '{1}' in parents".format(q, parent_id)
-            results = self._drive_service.files().list(q=q, fields="nextPageToken, files(*)").execute()
-            items = results.get('files', [])
-            for item in items:
-                if item["name"] == split_filename[0]:
-                    # Assuming every folder has a single parent
-                    return self._check_file_exists(os.path.sep.join(split_filename[1:]), item["id"])
-            return None
+        if len(filename) == 0:
+            # This is the lack of directory at the beginning of a 'file.txt'
+            # Since the target file lacks directories, the assumption is that it belongs at '/'
+            return self._drive_service.files().get(fileId='root').execute()
         else:
-            # This is a file, checking if exists
-            q = "name = '{0}'".format(split_filename[0])
-            if parent_id is not None:
-                q = "{0} and '{1}' in parents".format(q, parent_id)
-            results = self._drive_service.files().list(q=q, fields="nextPageToken, files(*)").execute()
-            items = results.get('files', [])
-            if len(items) == 0:
-                q = "" if parent_id is None else "'{0}' in parents".format(parent_id)
+            split_filename = self._split_path(filename)
+            if len(split_filename) > 1:
+                # This is an absolute path with folder inside
+                # First check if the first element exists as a folder
+                # If so call the method recursively with next portion of path
+                # Otherwise the path does not exists hence the file does not exists
+                q = "mimeType = '{0}' and name = '{1}'".format(self._GOOGLE_DRIVE_FOLDER_MIMETYPE_,
+                                                                split_filename[0])
+                if parent_id is not None:
+                    q = "{0} and '{1}' in parents".format(q, parent_id)
                 results = self._drive_service.files().list(q=q, fields="nextPageToken, files(*)").execute()
                 items = results.get('files', [])
                 for item in items:
-                    if split_filename[0] in item["name"]:
-                        return item
+                    if item["name"] == split_filename[0]:
+                        # Assuming every folder has a single parent
+                        return self._check_file_exists(os.path.sep.join(split_filename[1:]), item["id"])
                 return None
             else:
-                return items[0]
+                # This is a file, checking if exists
+                q = "name = '{0}'".format(split_filename[0])
+                if parent_id is not None:
+                    q = "{0} and '{1}' in parents".format(q, parent_id)
+                results = self._drive_service.files().list(q=q, fields="nextPageToken, files(*)").execute()
+                items = results.get('files', [])
+                if len(items) == 0:
+                    q = "" if parent_id is None else "'{0}' in parents".format(parent_id)
+                    results = self._drive_service.files().list(q=q, fields="nextPageToken, files(*)").execute()
+                    items = results.get('files', [])
+                    for item in items:
+                        if split_filename[0] in item["name"]:
+                            return item
+                    return None
+                else:
+                    return items[0]
 
     # Methods that had to be implemented
     # to create a valid storage for Django
@@ -309,6 +314,7 @@ class GoogleDriveStorage(Storage):
         return File(BytesIO(content), name)
 
     def _save(self, name, content):
+        name = os.path.join(settings.GOOGLE_DRIVE_STORAGE_MEDIA_ROOT, name)
         folder_path = os.path.sep.join(self._split_path(name)[:-1])
         folder_data = self._get_or_create_folder(folder_path)
         parent_id = None if folder_data is None else folder_data['id']

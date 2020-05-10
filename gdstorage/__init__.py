@@ -4,6 +4,7 @@ __version__ = '1.0.0'
 
 
 class GoogleDriveStorageConf(AppConf):
+    MEDIA_ROOT = ''
 
     class Meta:
         prefix = 'GOOGLE_DRIVE_STORAGE'

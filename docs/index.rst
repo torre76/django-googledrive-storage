@@ -62,6 +62,8 @@ Once installed, there are a few steps to configure the storage:
    GOOGLE_DRIVE_STORAGE_MEDIA_ROOT = '<base google drive path for file uploads>' # OPTIONAL
 
 The `GOOGLE_DRIVE_STORAGE_JSON_KEY_FILE` must be the path to *private json key file* obtained by Google.
+Alternatively, you can place the contents of your json private key file into an environment variable named
+`GOOGLE_DRIVE_STORAGE_JSON_KEY_FILE_CONTENTS`, this requires setting `GOOGLE_DRIVE_STORAGE_JSON_KEY_FILE` to `None`.
 
 The `GOOGLE_DRIVE_STORAGE_MEDIA_ROOT` is analogous to MEDIA_ROOT for django’s built-in FileSystemStorage
 

@@ -1,11 +1,12 @@
 from __future__ import unicode_literals
 
 import mimetypes
-import os.path
+import os
 from io import BytesIO
 
 import django
 import enum
+import json
 import six
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseUpload
@@ -174,8 +175,17 @@ class GoogleDriveStorage(Storage):
         """
         self._json_keyfile_path = json_keyfile_path or settings.GOOGLE_DRIVE_STORAGE_JSON_KEY_FILE
 
-        credentials = ServiceAccountCredentials.from_json_keyfile_name(self._json_keyfile_path,
-                                                                       scopes=["https://www.googleapis.com/auth/drive"])
+        if self._json_keyfile_path:
+            credentials = ServiceAccountCredentials.from_json_keyfile_name(
+                self._json_keyfile_path,
+                scopes=["https://www.googleapis.com/auth/drive"],
+            )
+        else:
+            credentials = ServiceAccountCredentials.from_json_keyfile_dict(
+                json.loads(os.environ['GOOGLE_DRIVE_STORAGE_JSON_KEY_FILE_CONTENTS']),
+                scopes=["https://www.googleapis.com/auth/drive"],
+            )
+
 
         self._permissions = None
         if permissions is None:

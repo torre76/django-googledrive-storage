@@ -394,7 +394,7 @@ class GoogleDriveStorage(Storage):
         if file_data is None:
             return 0
         else:
-            return file_data["fileSize"]
+            return file_data["size"]
 
     def url(self, name):
         """

@@ -318,6 +318,7 @@ class GoogleDriveStorage(Storage):
         done = False
         while done is False:
             _, done = downloader.next_chunk()
+        fh.seek(0)
         return File(fh, name)
 
     def _save(self, name, content):

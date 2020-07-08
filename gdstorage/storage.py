@@ -9,7 +9,7 @@ import enum
 import json
 import six
 from googleapiclient.discovery import build
-from googleapiclient.http import MediaIoBaseUpload
+from googleapiclient.http import MediaIoBaseUpload, MediaIoBaseDownload
 from dateutil.parser import parse
 from django.conf import settings
 from django.core.files import File
@@ -307,11 +307,19 @@ class GoogleDriveStorage(Storage):
     # to create a valid storage for Django
 
     def _open(self, name, mode='rb'):
+        """For more details see
+        https://developers.google.com/drive/api/v3/manage-downloads?hl=id#download_a_file_stored_on_google_drive
+        """
         file_data = self._check_file_exists(name)
-        response, content = self._drive_service._http.request(
-            file_data['webContentLink'])
-
-        return File(BytesIO(content), name)
+        request = self._drive_service.files().get_media(
+            fileId=file_data['id'])
+        fh = BytesIO()
+        downloader = MediaIoBaseDownload(fh, request)
+        done = False
+        while done is False:
+            _, done = downloader.next_chunk()
+        fh.seek(0)
+        return File(fh, name)
 
     def _save(self, name, content):
         name = os.path.join(settings.GOOGLE_DRIVE_STORAGE_MEDIA_ROOT, name)

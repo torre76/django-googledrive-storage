@@ -171,7 +171,8 @@ class GoogleDriveStorage(Storage):
         :param json_keyfile_path: Path
         :raise ValueError:
         """
-        self._json_keyfile_path = json_keyfile_path or settings.GOOGLE_DRIVE_STORAGE_JSON_KEY_FILE
+        settings_keyfile_path = getattr(settings, 'GOOGLE_DRIVE_STORAGE_JSON_KEY_FILE', None)
+        self._json_keyfile_path = json_keyfile_path or settings_keyfile_path
 
         if self._json_keyfile_path:
             credentials = Credentials.from_service_account_file(

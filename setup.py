@@ -12,9 +12,8 @@ INSTALL_REQUIRES = [
     "python-dateutil >= 2.5.3",
     "requests >= 2.10.0",
     "django-appconf >= 1.0.2",
-    "oauth2client >= 2.2.0",
-    "six >= 1.10.0",
-    "Django >= 3.0"
+    "google-auth >= 1.28.0,<2",
+    "Django >= 2.2"
 ]
 
 setuptools.setup(
@@ -40,5 +39,6 @@ setuptools.setup(
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8"
+        "Programming Language :: Python :: 3.9"
     ],
 )

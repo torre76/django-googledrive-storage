@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import mimetypes
 import os
 from io import BytesIO
@@ -7,16 +5,14 @@ from io import BytesIO
 import django
 import enum
 import json
-import six
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseUpload, MediaIoBaseDownload
 from dateutil.parser import parse
 from django.conf import settings
+from django.utils.deconstruct import deconstructible
 from django.core.files import File
 from django.core.files.storage import Storage
-from oauth2client.service_account import ServiceAccountCredentials
-
-DJANGO_VERSION = django.VERSION[:2]
+from google.oauth2.service_account import Credentials
 
 
 class GoogleDrivePermissionType(enum.Enum):
@@ -73,6 +69,7 @@ class GoogleDrivePermissionRole(enum.Enum):
     """
 
 
+@deconstructible
 class GoogleDriveFilePermission(object):
     """
         Describe a permission for Google Drive as described on
@@ -141,7 +138,7 @@ class GoogleDriveFilePermission(object):
             raise ValueError("Role should be a GoogleDrivePermissionRole instance")
         if not isinstance(g_type, GoogleDrivePermissionType):
             raise ValueError("Permission should be a GoogleDrivePermissionType instance")
-        if g_value is not None and not isinstance(g_value, six.string_types):
+        if g_value is not None and not isinstance(g_value, str):
             raise ValueError("Value should be a String instance")
 
         self._role = g_role
@@ -155,6 +152,7 @@ _ANYONE_CAN_READ_PERMISSION_ = GoogleDriveFilePermission(
 )
 
 
+@deconstructible
 class GoogleDriveStorage(Storage):
     """
     Storage class for Django that interacts with Google Drive as persistent storage.
@@ -176,12 +174,12 @@ class GoogleDriveStorage(Storage):
         self._json_keyfile_path = json_keyfile_path or settings.GOOGLE_DRIVE_STORAGE_JSON_KEY_FILE
 
         if self._json_keyfile_path:
-            credentials = ServiceAccountCredentials.from_json_keyfile_name(
+            credentials = Credentials.from_service_account_file(
                 self._json_keyfile_path,
                 scopes=["https://www.googleapis.com/auth/drive"],
             )
         else:
-            credentials = ServiceAccountCredentials.from_json_keyfile_dict(
+            credentials = Credentials.from_service_account_info(
                 json.loads(os.environ['GOOGLE_DRIVE_STORAGE_JSON_KEY_FILE_CONTENTS']),
                 scopes=["https://www.googleapis.com/auth/drive"],
             )
@@ -328,8 +326,8 @@ class GoogleDriveStorage(Storage):
         parent_id = None if folder_data is None else folder_data['id']
         # Now we had created (or obtained) folder on GDrive
         # Upload the file
-        mime_type = mimetypes.guess_type(name)
-        if mime_type[0] is None:
+        mime_type, _ = mimetypes.guess_type(name)
+        if mime_type is None:
             mime_type = self._UNKNOWN_MIMETYPE_
         media_body = MediaIoBaseUpload(content.file, mime_type, resumable=True, chunksize=1024 * 512)
         body = {
@@ -348,7 +346,7 @@ class GoogleDriveStorage(Storage):
             self._drive_service.permissions().create(fileId=file_data["id"],
                                                      body={**p.raw}).execute()
 
-        return file_data.get(u'originalFilename', file_data.get(u'name'))
+        return file_data.get('originalFilename', file_data.get('name'))
 
     def delete(self, name):
         """
@@ -444,32 +442,15 @@ class GoogleDriveStorage(Storage):
         else:
             return parse(file_data["modifiedDate"])
 
+    def deconstruct(self):
+        """
+            Handle field serialization to support migration
 
-if DJANGO_VERSION >= (1, 7):
-    from django.utils.deconstruct import deconstructible
-
-
-    @deconstructible
-    class GoogleDriveStorage(GoogleDriveStorage):
-        def deconstruct(self):
-            """
-                Handle field serialization to support migration
-
-            """
-            name, path, args, kwargs = \
-                super(GoogleDriveStorage, self).deconstruct()
-            if self._service_email is not None:
-                kwargs["service_email"] = self._service_email
-            if self._json_keyfile_path is not None:
-                kwargs["json_keyfile_path"] = self._json_keyfile_path
-
-
-    @deconstructible
-    class GoogleDriveFilePermission(GoogleDriveFilePermission):
-        def deconstruct(self):
-            """
-            Add a deconstructor to make the object serializable inorder to support migration
-
-            """
-            name, path, args, kwargs = \
-                super(GoogleDriveFilePermission, self).deconstruct()
+        """
+        name, path, args, kwargs = \
+            super(GoogleDriveStorage, self).deconstruct()
+        if self._service_email is not None:
+            kwargs["service_email"] = self._service_email
+        if self._json_keyfile_path is not None:
+            kwargs["json_keyfile_path"] = self._json_keyfile_path
+        return name, path, args, kwargs

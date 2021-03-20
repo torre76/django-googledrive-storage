@@ -18,7 +18,7 @@ jobs:
     - name: Install dependencies
       run: |
         pip install -U pip
-        pip install -U Django==${{ matrix.django-version }}
+        pip install -U Django==${{ matrix.django-version }} pytest
     - name: Run tests
       run: |
         python setup.py install
@@ -26,6 +26,6 @@ jobs:
         cp -av test/settings.py gdtest/gdtest/
         cp -av gdstorage/tests.py gdtest/gdtest/
         cp -av test/ gdtest/
-        cd gdtest && python manage.py test
+        cd gdtest && pytest -v --ds gdtest.settings gdtest/tests.py
       env:
         GOOGLE_DRIVE_STORAGE_JSON_KEY_FILE_CONTENTS: ${{ secrets.GDSTORAGE_KEY_FILE_CONTENT }}

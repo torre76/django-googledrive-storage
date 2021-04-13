@@ -415,6 +415,18 @@ class GoogleDriveStorage(Storage):
         else:
             return file_data["webContentLink"]
 
+
+    def url_web_view(self, name):
+        """
+        Returns web view link where the file's contents can be accessed
+        directly via the Web browser.
+        """
+        file_data = self._check_file_exists(name)
+        if file_data is None:
+            return None
+        else:
+            return file_data["webViewLink"]
+
     def accessed_time(self, name):
         """
         Returns the last accessed time (as datetime object) of the file

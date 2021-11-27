@@ -1,0 +1,31 @@
+name: tests
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.6', '3.7', '3.8', '3.9']
+        django-version: ['2.2.*', '3.0.*', '3.1.*']
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }} / Django ${{ matrix.django-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        pip install -U pip
+        pip install -U Django==${{ matrix.django-version }} pytest-django
+    - name: Run tests
+      run: |
+        python setup.py install
+        django-admin.py startproject gdtest
+        cp -av test/settings.py gdtest/gdtest/
+        cp -av gdstorage/tests.py gdtest/gdtest/
+        cp -av test/ gdtest/
+        cd gdtest && pytest -v --ds gdtest.settings gdtest/tests.py
+      env:
+        GOOGLE_DRIVE_STORAGE_JSON_KEY_FILE_CONTENTS: ${{ secrets.GDSTORAGE_KEY_FILE_CONTENT }}

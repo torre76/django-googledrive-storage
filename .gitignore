@@ -20,3 +20,4 @@ docs/out
 .ropeproject
 .vscode/
 gdtest/
+docs/_build

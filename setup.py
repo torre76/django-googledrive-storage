@@ -24,7 +24,7 @@ setuptools.setup(
     license="LICENSE.txt",
     keywords="django google drive storage googledrive",
     url="https://github.com/torre76/django-googledrive-storage",
-    download_url="https://github.com/torre76/django-googledrive-storage/tarball/1.5.2",
+    download_url="https://github.com/torre76/django-googledrive-storage/tarball/1.6.0",
     packages=setuptools.find_packages(
         exclude=["django_googledrive_storage", "gdstorage.tests", "docs"]),
     long_description=long_description,

@@ -1,8 +1,13 @@
+.. # define a hard line break for HTML
+.. |br| raw:: html
+
+   <br />
+
 Django Google Drive Storage
 ===========================
 
 `Django Google Drive Storage <https://github.com/torre76/django-googledrive-storage/>`_
-is a `Django Storage <https://docs.djangoproject.com/en/1.7/ref/files/storage/>`_
+is a `Django Storage <https://docs.djangoproject.com/en/3.2/ref/files/storage/>`_
 implementation that uses `Google Drive <https://drive.google.com>`_ as a backend for storing data.
 
 Please take note that with **this implementation you could not save or load data from a user's Drive**.
@@ -61,20 +66,11 @@ Once installed, there are a few steps to configure the storage:
    GOOGLE_DRIVE_STORAGE_JSON_KEY_FILE = '<path to your json private key file>'
    GOOGLE_DRIVE_STORAGE_MEDIA_ROOT = '<base google drive path for file uploads>' # OPTIONAL
 
-The `GOOGLE_DRIVE_STORAGE_JSON_KEY_FILE` must be the path to *private json key file* obtained by Google.
+The `GOOGLE_DRIVE_STORAGE_JSON_KEY_FILE` must be the path to *private json key file* obtained by Google. |br|
 Alternatively, you can place the contents of your json private key file into an environment variable named
 `GOOGLE_DRIVE_STORAGE_JSON_KEY_FILE_CONTENTS`, this requires setting `GOOGLE_DRIVE_STORAGE_JSON_KEY_FILE` to `None`.
 
 The `GOOGLE_DRIVE_STORAGE_MEDIA_ROOT` is analogous to MEDIA_ROOT for django’s built-in FileSystemStorage
-
-.. note::
-
-   **Django Google Drive Storage** is using `Django Appconf <http://django-appconf.readthedocs.org/>`_ to handle
-   settings, so you can setup `GOOGLE_DRIVE_STORAGE_JSON_KEY_FILE` as an environment variable outside the Django app.
-
-   This will increase security to your environment.
-
-   Thanks to `Johannes Hoppe <https://github.com/codingjoe>`_ for his contribution
 
 * instantiate the storage on you `models.py` file before using into the models:
 
@@ -130,10 +126,6 @@ This code block will assign read only capabilities only to the user identified b
        id = models.AutoField( primary_key=True)
        map_name = models.CharField(max_length=200)
        map_data = models.FileField(upload_to='maps/', storage=gd_storage)
-
-.. note::
-
-   Thanks to `Anna Sirota <https://github.com/anka-sirota>`_ for her contribution
 
 Source and License
 ******************

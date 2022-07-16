@@ -186,7 +186,7 @@ class GoogleDriveStorage(Storage):
                 # Ok, permissions are good
                 self._permissions = permissions
 
-        self._drive_service = build('drive', 'v3', credentials=credentials)
+        self._drive_service = build('drive', 'v3', credentials=credentials, cache_discovery=False)
 
     def _split_path(self, p):
         """

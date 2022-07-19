@@ -14,8 +14,9 @@ Please take note that with **this implementation you could not save or load data
 You can use only a Drive **dedicated to a Google Project**. This means that:
 
 * this storage interacts with Google Drive as a Google Project, not a Google User.
-* your project can use Google Drive only through `Google Drive SDK <https://developers.google.com/drive/>`_. Because no user is associated with this Drive, **you cannot use Google Drive User Interface**.
+* your project can use Google Drive only through `Google Drive SDK <https://developers.google.com/drive/>`_. Because no user is associated with this Drive, **you cannot use Google Drive User Interface**.  
 * this storage authenticates with Google using public private keys. See prerequisites_ for how to obtain it.
+Note: It is possible to view the files if shared with a Google User account, as per `here <https://stackoverflow.com/questions/23382342/google-drive-access-for-service-account/>`_.
 
 Having stated that, with this storage you gain a 15GB space hosted on Google Server where you are able to store data
 using Django models.
